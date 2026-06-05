@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bahari Fresh - Admin Panel</title>
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#0a5c4b">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui; }
+        body { background: #f0f2f5; padding: 20px; }
+        .container { max-width: 1400px; margin: 0 auto; }
+        h1 { color: #0a5c4b; margin-bottom: 20px; }
+        .admin-nav { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
+        .admin-nav button { padding: 10px 20px; background: #0a5c4b; color: white; border: none; border-radius: 40px; cursor: pointer; }
+        .admin-nav button.active { background: #ffcd3c; color: #0a5c4b; font-weight: bold; }
+        .section { background: white; border-radius: 28px; padding: 25px; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
+        th { background: #f8f9fa; }
+        input, select { padding: 8px 12px; border-radius: 12px; border: 1px solid #ddd; width: 100%; }
+        button { background: #0a5c4b; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; }
+        .delete-btn { background: #c0392b; }
+        .add-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 15px; margin-bottom: 30px; align-items: end; }
+        .logout { float: right; background: #c0392b; margin-top: 10px; margin-left: 10px; }
+        .profile-card { background: #f8f9fa; padding: 20px; border-radius: 20px; margin-bottom: 30px; }
+        .profile-card input { margin-bottom: 10px; }
+        .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
+        .image-upload-cell { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .image-upload-cell input[type="file"] { display: none; }
+        .image-upload-cell .upload-btn { background: #0a5c4b; color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
+        .image-upload-cell .url-input { width: 120px; }
+        .gallery-upload { background: #2c6e2f; margin-left: 5px; }
+        @media (max-width: 700px) { table { font-size: 12px; } .image-upload-cell { flex-direction: column; align-items: stretch; } }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+<div class="container">
+    <h1>⚓ Bahari Fresh - Admin Dashboard</h1>
+    <div style="text-align:right;">
+        <button class="logout" onclick="logout()">Logout</button>
+    </div>
+    <div class="admin-nav">
+        <button id="btnProfile" class="active" onclick="showSection('profile')">My Profile</button>
+        <button id="btnProducts" onclick="showSection('products')">Products</button>
+        <button id="btnOrders" onclick="showSection('orders')">Orders</button>
+        <button id="btnUsers" onclick="showSection('users')">Users</button>
+    </div>
+    
+    <div id="profileSection" class="section">
+        <h2>Admin Profile Settings</h2>
+        <div class="profile-card">
+            <label>Email Address</label>
+            <input type="email" id="adminEmail" placeholder="Email">
+            <label>New Password (leave blank to keep current)</label>
+            <input type="password" id="adminPassword" placeholder="New Password">
+            <button onclick="updateAdminProfile()">Update Profile</button>
+            <p id="profileMessage" style="margin-top:10px;"></p>
+        </div>
+    </div>
+    
+    <div id="productsSection" class="section" style="display:none;">
+        <h2>Manage Products</h2>
+        <div class="add-form">
+            <input type="text" id="prodName" placeholder="Product Name (e.g., Kingfish)" required>
+            <input type="number" id="prodPrice" placeholder="Price per kg (KSh)" required>
+            <input type="text" id="prodCategory" placeholder="Category (Fish, Shellfish, Other)">
+            <input type="number" id="prodStock" placeholder="Stock (kg)" required>
+            <div style="display: flex; gap: 8px;">
+                <label class="upload-btn" style="background:#0a5c4b; color:white; padding:8px 16px; border-radius:40px; cursor:pointer;">📁 Choose from Gallery
+                    <input type="file" id="prodImageFile" accept="image/*" style="display:none;" onchange="previewAndUpload(this)">
+                </label>
+            </div>
+            <button onclick="addProduct()">➕ Add Product</button>
+        </div>
+        <div style="overflow-x:auto;">
+            <table id="productsTable">
+                <thead>
+                    <tr><th>Image</th><th>Name</th><th>Price (KSh/kg)</th><th>Category</th><th>Stock (kg)</th><th>Actions</th></tr>
+                </thead>
+                <tbody></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="ordersSection" class="section" style="display:none;">
+        <h2>Customer Orders</h2>
+        <div style="overflow-x:auto;"><table id="ordersTable"><thead><tr><th>Phone</th><th>Items</th><th>Total (KSh)</th><th>Status</th><th>Date</th></tr></thead><tbody></tbody></table></div>
+    </div>
+    
+    <div id="usersSection" class="section" style="display:none;">
+        <h2>Manage Admin Users</h2>
+        <div class="add-form">
+            <input type="email" id="newAdminEmail" placeholder="User Email to make admin">
+            <button onclick="addAdmin()">➕ Add Admin</button>
+        </div>
+        <div style="overflow-x:auto;"><table id="adminsTable"><thead><tr><th>Email</th><th>Role</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
+    </div>
+</div>
+
+<script>
+    const SUPABASE_URL = 'https://qhpzqtwzifgthwovkpwp.supabase.co';
+    const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocHpxdHd6aWZndGh3b3ZrcHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjkzMzMsImV4cCI6MjA4ODQwNTMzM30.rgo0X-UWShZAAyvi9hRqSka44ZIJ-2GlvTNsxkFBKgU';
+    const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    let currentUser = null;
+    let tempProductFile = null;
+    
+    async function checkAdmin() {
+        const { data: { user } } = await _supabase.auth.getUser();
+        if (!user) { window.location.href = 'index.html'; return; }
+        const { data: admin } = await _supabase.from('admin_users').select('email').eq('email', user.email).single();
+        if (!admin) { alert("Not an admin"); window.location.href = 'index.html'; return; }
+        currentUser = user;
+        document.getElementById('adminEmail').value = user.email;
+    }
+    
+    async function updateAdminProfile() {
+        const newEmail = document.getElementById('adminEmail').value;
+        const newPassword = document.getElementById('adminPassword').value;
+        const updates = {};
+        if (newEmail && newEmail !== currentUser.email) updates.email = newEmail;
+        if (newPassword) updates.password = newPassword;
+        if (Object.keys(updates).length === 0) { document.getElementById('profileMessage').innerText = "No changes made."; return; }
+        const { error } = await _supabase.auth.updateUser(updates);
+        if (error) document.getElementById('profileMessage').innerText = "Error: " + error.message;
+        else { document.getElementById('profileMessage').innerText = "Profile updated! Please login again."; setTimeout(() => logout(), 2000); }
+    }
+    
+    // Upload image to Supabase Storage (public bucket)
+    async function uploadImageToStorage(file, productId) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `product-${productId}-${Date.now()}.${fileExt}`;
+        const { data, error } = await _supabase.storage.from('product-images').upload(fileName, file);
+        if (error) throw error;
+        const { data: publicUrl } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+        return publicUrl.publicUrl;
+    }
+    
+    // Delete image from storage (optional cleanup)
+    async function deleteImageFromStorage(imageUrl) {
+        if (!imageUrl || !imageUrl.includes('product-images')) return;
+        const fileName = imageUrl.split('/').pop();
+        await _supabase.storage.from('product-images').remove([fileName]);
+    }
+    
+    // Called when admin selects a file from gallery (add product)
+    window.previewAndUpload = async (input) => {
+        const file = input.files[0];
+        if (!file) return;
+        tempProductFile = file;
+        alert("Image selected. Click 'Add Product' to finish.");
+    };
+    
+    // Add product with optional image upload
+    async function addProduct() {
+        const name = document.getElementById('prodName').value.trim();
+        const price = parseFloat(document.getElementById('prodPrice').value);
+        const category = document.getElementById('prodCategory').value.trim();
+        const stock = parseInt(document.getElementById('prodStock').value);
+        if (!name || isNaN(price) || isNaN(stock)) { alert("Name, price, and stock are required"); return; }
+        
+        // Insert product first to get ID
+        const { data: newProduct, error: insertError } = await _supabase
+            .from('products')
+            .insert([{ name, price, category, stock_quantity: stock, image_url: '' }])
+            .select()
+            .single();
+        if (insertError) { alert(insertError.message); return; }
+        
+        // If an image was selected, upload it and update product
+        if (tempProductFile) {
+            try {
+                const publicUrl = await uploadImageToStorage(tempProductFile, newProduct.id);
+                await _supabase.from('products').update({ image_url: publicUrl }).eq('id', newProduct.id);
+                tempProductFile = null;
+            } catch (err) { console.error("Image upload failed", err); alert("Product added but image upload failed."); }
+        }
+        // Clear form
+        document.getElementById('prodName').value = '';
+        document.getElementById('prodPrice').value = '';
+        document.getElementById('prodCategory').value = '';
+        document.getElementById('prodStock').value = '';
+        document.getElementById('prodImageFile').value = '';
+        loadProducts();
+    }
+    
+    // Inline updates
+    async function updateProductPrice(id, newPrice) {
+        if (isNaN(newPrice)) return;
+        await _supabase.from('products').update({ price: parseFloat(newPrice) }).eq('id', id);
+        loadProducts();
+    }
+    async function updateProductStock(id, newStock) {
+        await _supabase.from('products').update({ stock_quantity: parseInt(newStock) }).eq('id', id);
+        loadProducts();
+    }
+    
+    // Update product image via file upload (inline)
+    async function updateProductImageFromFile(id, input) {
+        const file = input.files[0];
+        if (!file) return;
+        try {
+            const publicUrl = await uploadImageToStorage(file, id);
+            await _supabase.from('products').update({ image_url: publicUrl }).eq('id', id);
+            loadProducts();
+        } catch (err) { alert("Image upload failed"); }
+        input.value = '';
+    }
+    
+    // Update product image via URL
+    async function updateProductImageFromUrl(id, url) {
+        if (!url) return;
+        await _supabase.from('products').update({ image_url: url }).eq('id', id);
+        loadProducts();
+    }
+    
+    // Delete product (and optionally its image)
+    async function deleteProduct(id, imageUrl) {
+        if (!confirm("Delete this product permanently?")) return;
+        // Delete from storage if image exists
+        if (imageUrl && imageUrl.includes('product-images')) {
+            try {
+                const fileName = imageUrl.split('/').pop();
+                await _supabase.storage.from('product-images').remove([fileName]);
+            } catch(e) { console.warn("Could not delete image", e); }
+        }
+        // Delete from database
+        const { error } = await _supabase.from('products').delete().eq('id', id);
+        if (error) alert(error.message);
+        else loadProducts();
+    }
+    
+    async function loadProducts() {
+        const { data, error } = await _supabase.from('products').select('*').order('name');
+        if (error) return;
+        const tbody = document.querySelector('#productsTable tbody');
+        tbody.innerHTML = data.map(p => `
+            <tr>
+                <td><img src="${p.image_url || '/images/placeholder.jpg'}" class="img-preview" onerror="this.src='/images/placeholder.jpg'"></td>
+                <td>${p.name}</td>
+                <td><input type="number" value="${p.price}" style="width:100px;" onchange="updateProductPrice('${p.id}', this.value)"></td>
+                <td>${p.category || '-'}</td>
+                <td><input type="number" value="${p.stock_quantity}" style="width:80px;" onchange="updateProductStock('${p.id}', this.value)"></td>
+                <td>
+                    <div class="image-upload-cell">
+                        <label class="upload-btn" style="background:#0a5c4b; color:white; padding:4px 8px; border-radius:20px; cursor:pointer; font-size:12px;">📷 Gallery
+                            <input type="file" accept="image/*" style="display:none;" onchange="updateProductImageFromFile('${p.id}', this)">
+                        </label>
+                        <input type="text" class="url-input" placeholder="Image URL" style="width:100px;" onblur="updateProductImageFromUrl('${p.id}', this.value)">
+                        <button class="delete-btn" onclick="deleteProduct('${p.id}', '${p.image_url || ''}')">Delete</button>
+                    </div>
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    async function loadOrders() {
+        const { data, error } = await _supabase.from('orders').select('*').order('created_at', { ascending: false });
+        if (error) return;
+        const tbody = document.querySelector('#ordersTable tbody');
+        tbody.innerHTML = data.map(o => `<tr><td>${o.customer_phone}</td><td>${o.items.substring(0,50)}${o.items.length>50?'...':''}</td><td>KSh ${o.total_price.toLocaleString()}</td><td>${o.status}</td><td>${new Date(o.created_at).toLocaleString()}</td>`).join('');
+    }
+    
+    async function loadAdmins() {
+        const { data, error } = await _supabase.from('admin_users').select('*');
+        if (error) return;
+        const tbody = document.querySelector('#adminsTable tbody');
+        tbody.innerHTML = data.map(admin => `<tr><td>${admin.email}</td><td>Admin</td><td><button class="delete-btn" onclick="removeAdmin('${admin.email}')">Remove</button></td>`).join('');
+    }
+    async function addAdmin() {
+        const email = document.getElementById('newAdminEmail').value.trim();
+        if (!email) { alert("Enter email"); return; }
+        const { error } = await _supabase.from('admin_users').insert([{ email }]);
+        if (error) alert(error.message);
+        else { loadAdmins(); document.getElementById('newAdminEmail').value = ''; }
+    }
+    async function removeAdmin(email) {
+        if (email === currentUser.email) { alert("You cannot remove yourself"); return; }
+        await _supabase.from('admin_users').delete().eq('email', email);
+        loadAdmins();
+    }
+    
+    function showSection(section) {
+        document.getElementById('profileSection').style.display = section === 'profile' ? 'block' : 'none';
+        document.getElementById('productsSection').style.display = section === 'products' ? 'block' : 'none';
+        document.getElementById('ordersSection').style.display = section === 'orders' ? 'block' : 'none';
+        document.getElementById('usersSection').style.display = section === 'users' ? 'block' : 'none';
+        ['btnProfile','btnProducts','btnOrders','btnUsers'].forEach(id => document.getElementById(id).classList.remove('active'));
+        document.getElementById(`btn${section.charAt(0).toUpperCase()+section.slice(1)}`).classList.add('active');
+        if (section === 'products') loadProducts();
+        if (section === 'orders') loadOrders();
+        if (section === 'users') loadAdmins();
+    }
+    
+    async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
+    
+    window.onload = async () => { await checkAdmin(); showSection('profile'); };
+    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(console.log); }
+</script>
+</body>
+</html>

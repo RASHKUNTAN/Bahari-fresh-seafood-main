@@ -1,0 +1,22 @@
+require('dotenv').config();
+const supabase = require('./utils/supabaseClient');
+
+const products = [
+    { name: 'Kingfish', price: 1500, category: 'Fish', stock_quantity: 45, image_url: 'kingfish.jpg' },
+    { name: 'Shrimps', price: 1200, category: 'Shellfish', stock_quantity: 60, image_url: 'shrimps.jpg' },
+    { name: 'Silver Fish', price: 800, category: 'Fish', stock_quantity: 100, image_url: 'silver.jpg' },
+    { name: 'Pomfret', price: 1100, category: 'Fish', stock_quantity: 35, image_url: 'pomfret.jpg' },
+    { name: 'Red Snapper', price: 950, category: 'Fish', stock_quantity: 40, image_url: 'redsnapper.jpg' },
+    { name: 'Lobster', price: 2500, category: 'Shellfish', stock_quantity: 25, image_url: 'lobster.jpg' }
+];
+
+async function seed() {
+    for (const p of products) {
+        const { error } = await supabase.from('products').insert([p]);
+        if (error) console.error(`Error inserting ${p.name}:`, error.message);
+        else console.log(`Inserted ${p.name} with stock ${p.stock_quantity}`);
+    }
+    console.log('Seeding complete.');
+}
+
+seed();
