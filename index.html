@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bahari Fresh | Premium Seafood</title>
     <style>
-        /* Styles remain the same as your professional layout */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
         :root { --primary: #0a5c4b; --secondary: #ffcd3c; --bg-light: #f9f7f3; }
         body { background: var(--bg-light); color: #333; }
@@ -15,9 +14,20 @@
         .sidebar { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: white; z-index: 2000; transition: 0.4s; box-shadow: -10px 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
         .sidebar.active { right: 0; }
         .buy-btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; }
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 3000; align-items: center; justify-content: center; }
+        .buy-btn:disabled { background: #ccc; cursor: not-allowed; }
+        
+        /* Auth Modal Styles */
+        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
+        .modal.active { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 24px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        .modal-content h2 { color: var(--primary); margin-bottom: 20px; }
+        .modal-content input { width: 100%; padding: 12px 16px; margin-bottom: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 1rem; outline: none; }
+        .modal-content input:focus { border-color: var(--primary); }
+        .modal-content p { font-size: 0.9rem; margin-top: 15px; cursor: pointer; color: #55px; }
+        .modal-content p b { color: var(--primary); }
+        .close-modal-btn { background: none; border: none; color: #999; margin-top: 12px; cursor: pointer; font-weight: 600; }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
 </head>
 <body>
 
@@ -25,7 +35,7 @@
     <div style="font-size: 1.5rem; font-weight: 800;">⚓ BAHARI FRESH</div>
     <div style="display: flex; gap: 15px; align-items: center;">
         <a id="adminDashBtn" href="admin.html" style="display:none;" class="admin-link">ADMIN</a>
-        <span id="authBtn" style="cursor:pointer;">Login</span>
+        <span id="authBtn" onclick="handleAuthClick()" style="cursor:pointer; font-weight: 600;">Login</span>
         <div onclick="toggleCart()" style="cursor:pointer; background:var(--secondary); color:var(--primary); padding:8px 15px; border-radius:40px; font-weight:800;">
             🛒 <span id="cart-count">0</span>
         </div>
@@ -34,12 +44,25 @@
 
 <div id="productGrid" class="product-grid"></div>
 
+<div id="authModal" class="modal">
+    <div class="modal-content">
+        <h2 id="modalTitle">Login</h2>
+        <form id="authForm" onsubmit="submitAuthForm(event)">
+            <input type="email" id="authEmail" placeholder="Email Address" required>
+            <input type="password" id="authPass" placeholder="Password" required>
+            <button type="submit" id="authSubmitBtn" class="buy-btn">Sign In</button>
+        </form>
+        <p id="authSwitch" onclick="toggleAuthMode()">New to Bahari Fresh? <b>Create Account</b></p>
+        <button class="close-modal-btn" onclick="closeAuthModal()">Cancel</button>
+    </div>
+</div>
+
 <aside id="cartSidebar" class="sidebar">
     <div style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
         <h2>Basket</h2>
         <span onclick="toggleCart()" style="cursor:pointer; font-size: 24px;">&times;</span>
     </div>
-    <div id="cartItemsList" style="flex-grow: 1; padding: 20px;"></div>
+    <div id="cartItemsList" style="flex-grow: 1; padding: 20px; overflow-y: auto;"></div>
     <div style="padding: 20px; border-top: 1px solid #eee;">
         <h3 id="cartTotal">Total: KSh 0</h3>
         <input type="tel" id="mpesaPhone" placeholder="2547XXXXXXXX" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd;">
@@ -48,59 +71,143 @@
 </aside>
 
 <script>
-    // Config
     const SUPABASE_URL = 'https://qhpzqtwzifgthwovkpwp.supabase.co';
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocHpxdHd6aWZndGh3b3ZrcHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjkzMzMsImV4cCI6MjA4ODQwNTMzM30.rgo0X-UWShZAAyvi9hRqSka44ZIJ-2GlvTNsxkFBKgU";
-    const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    
+    // Fallback resolution array initialization 
+    const supabaseClient = window.supabase || singletonSupabase;
+    const _supabase = supabaseClient.createClient(SUPABASE_URL, SUPABASE_KEY);
 
     let cart = [];
     let allProducts = [];
+    let isLoginMode = true; // Tracks whether modal is on Login or Register mode
+    let currentUser = null;
 
     async function init() {
+        // Fetch products
         const { data } = await _supabase.from('products').select('*');
         if (data) {
             allProducts = data;
             document.getElementById('productGrid').innerHTML = data.map(p => `
                 <div style="background:white; padding:15px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.05)">
-                    <img src="${p.image_url}" style="width:100%; height:180px; object-fit:cover; border-radius:15px;">
+                    <img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/250x180?text=No+Image'" style="width:100%; height:180px; object-fit:cover; border-radius:15px;">
                     <h3 style="margin:10px 0">${p.name}</h3>
                     <p style="font-weight:bold; color:var(--primary)">KSh ${p.price}</p>
                     <button class="buy-btn" onclick="addToCart(${p.id})">Add to Basket</button>
                 </div>
             `).join('');
         }
-        checkUser();
+        
+        // Listen to active auth status shifts safely
+        _supabase.auth.onAuthStateChange((event, session) => {
+            currentUser = session?.user || null;
+            updateAuthUI();
+        });
     }
 
-    async function checkUser() {
-        const { data: { user } } = await _supabase.auth.getUser();
-        if (user) {
-            document.getElementById('authBtn').innerText = "Logout";
-            if(user.email === 'rashidray082@gmail.com') document.getElementById('adminDashBtn').style.display = 'block';
+    function updateAuthUI() {
+        const authBtn = document.getElementById('authBtn');
+        const adminDashBtn = document.getElementById('adminDashBtn');
+        
+        if (currentUser) {
+            authBtn.innerText = `Logout (${currentUser.email.split('@')[0]})`;
+            if (currentUser.email === 'rashidray082@gmail.com') {
+                adminDashBtn.style.display = 'block';
+            } else {
+                adminDashBtn.style.display = 'none';
+            }
+        } else {
+            authBtn.innerText = "Login";
+            adminDashBtn.style.display = 'none';
         }
     }
 
+    async function handleAuthClick() {
+        if (currentUser) {
+            // Log user out
+            const { error } = await _supabase.auth.signOut();
+            if (error) alert(error.message);
+        } else {
+            // Open auth window
+            document.getElementById('authModal').classList.add('active');
+        }
+    }
+
+    function closeAuthModal() {
+        document.getElementById('authModal').classList.remove('active');
+        document.getElementById('authForm').reset();
+    }
+
+    function toggleAuthMode() {
+        isLoginMode = !isLoginMode;
+        const title = document.getElementById('modalTitle');
+        const submitBtn = document.getElementById('authSubmitBtn');
+        const switchTxt = document.getElementById('authSwitch');
+
+        if (isLoginMode) {
+            title.innerText = "Login";
+            submitBtn.innerText = "Sign In";
+            switchTxt.innerHTML = "New to Bahari Fresh? <b>Create Account</b>";
+        } else {
+            title.innerText = "Create Account";
+            submitBtn.innerText = "Sign Up";
+            switchTxt.innerHTML = "Already have an account? <b>Sign In</b>";
+        }
+    }
+
+    async function submitAuthForm(e) {
+        e.preventDefault();
+        const email = document.getElementById('authEmail').value.trim();
+        const password = document.getElementById('authPass').value;
+        const submitBtn = document.getElementById('authSubmitBtn');
+
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Please wait...";
+
+        let result;
+        if (isLoginMode) {
+            result = await _supabase.auth.signInWithPassword({ email, password });
+        } else {
+            result = await _supabase.auth.signUp({ email, password });
+        }
+
+        submitBtn.disabled = false;
+        submitBtn.innerText = isLoginMode ? "Sign In" : "Sign Up";
+
+        if (result.error) {
+            alert(result.error.message);
+        } else {
+            if (!isLoginMode && result.data?.user && result.data.session === null) {
+                alert("Account created! Please check your email for a verification link.");
+            }
+            closeAuthModal();
+        }
+    }
+
+    // CART SYSTEM
     function addToCart(id) {
         const p = allProducts.find(x => x.id === id);
-        cart.push(p);
-        updateCart();
+        if (p) {
+            cart.push(p);
+            updateCart();
+        }
     }
 
     function updateCart() {
         document.getElementById('cart-count').innerText = cart.length;
         const total = cart.reduce((sum, item) => sum + item.price, 0);
-        document.getElementById('cartTotal').innerText = `Total: KSh ${total}`;
+        document.getElementById('cartTotal').innerText = `Total: KSh ${total.toLocaleString()}`;
         document.getElementById('cartItemsList').innerHTML = cart.map((item, i) => `
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:10px; background:#f9f9f9; padding:8px; border-radius:8px;">
                 <span>${item.name}</span>
-                <button onclick="cart.splice(${i},1); updateCart()" style="color:red; background:none; border:none; cursor:pointer;">&times;</button>
+                <button onclick="cart.splice(${i},1); updateCart()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">&times;</button>
             </div>
         `).join('');
     }
 
     function toggleCart() { document.getElementById('cartSidebar').classList.toggle('active'); }
 
-    // THE CASH-OUT DARAJA LOGIC
+    // M-PESA CHECKOUT DARAJA LAYER
     async function processCheckout() {
         const phone = document.getElementById('mpesaPhone').value.trim();
         const amount = cart.reduce((sum, item) => sum + item.price, 0);
@@ -109,13 +216,13 @@
             return alert("Invalid Phone! Use 2547XXXXXXXX");
         }
 
+        if (amount === 0) return alert("Your basket is empty!");
+
         const btn = document.getElementById('payBtn');
         btn.innerText = "WAITING FOR PIN...";
         btn.disabled = true;
 
         try {
-            // This calls your Daraja logic via Supabase Edge Function
-            // You MUST deploy the function named 'daraja-stk-push' in Supabase
             const { data, error } = await _supabase.functions.invoke('daraja-stk-push', {
                 body: { 
                     phone: phone, 
