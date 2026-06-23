@@ -32,10 +32,32 @@
         .image-upload-cell .url-input { width: 120px; }
         .gallery-upload { background: #2c6e2f; margin-left: 5px; }
         @media (max-width: 700px) { table { font-size: 12px; } .image-upload-cell { flex-direction: column; align-items: stretch; } }
+
+        /* Admin Gateway Overlay Panel Styles */
+        .login-overlay { position: fixed; inset: 0; background: rgba(10, 92, 75, 0.98); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: white; padding: 40px; border-radius: 28px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
+        .login-card h2 { color: #0a5c4b; margin-bottom: 10px; }
+        .login-card p { color: #666; margin-bottom: 25px; font-size: 0.9rem; }
+        .login-card input { margin-bottom: 15px; padding: 12px; font-size: 1rem; }
+        .login-card button { width: 100%; padding: 14px; font-size: 1rem; font-weight: bold; margin-top: 5px; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+<div id="adminLoginOverlay" class="login-overlay" style="display: none;">
+    <div class="login-card">
+        <h2>⚓ Admin Gateway</h2>
+        <p>Log in with your administrator email account credentials</p>
+        <form id="adminLoginForm" onsubmit="submitAdminLogin(event)">
+            <input type="email" id="loginEmail" placeholder="Admin Email" required>
+            <input type="password" id="loginPassword" placeholder="Password" required>
+            <button type="submit" id="loginSubmitBtn">Sign In to Dashboard</button>
+        </form>
+        <button onclick="window.location.href='index.html'" style="background: none; color: #777; margin-top: 15px; font-weight: normal;">← Back to Store</button>
+    </div>
+</div>
+
 <div class="container">
     <h1>⚓ Bahari Fresh - Admin Dashboard</h1>
     <div style="text-align:right;">
@@ -51,8 +73,8 @@
     <div id="profileSection" class="section">
         <h2>Admin Profile Settings</h2>
         <div class="profile-card">
-            <label>Email Address</label>
-            <input type="email" id="adminEmail" placeholder="Email">
+            <label>Admin Email Account</label>
+            <input type="email" id="adminEmail" placeholder="Admin Email" disabled>
             <label>New Password (leave blank to keep current)</label>
             <input type="password" id="adminPassword" placeholder="New Password">
             <button onclick="updateAdminProfile()">Update Profile</button>
@@ -108,26 +130,61 @@
     
     async function checkAdmin() {
         const { data: { user } } = await _supabase.auth.getUser();
-        if (!user) { window.location.href = 'index.html'; return; }
-        const { data: admin } = await _supabase.from('admin_users').select('email').eq('email', user.email).single();
-        if (!admin) { alert("Not an admin"); window.location.href = 'index.html'; return; }
+        
+        // If no user exists, pull open the login interface card container layer
+        if (!user) { 
+            document.getElementById('adminLoginOverlay').style.display = 'flex';
+            return; 
+        }
+        
+        // Confirm the profile entry exists in the whitelist table
+        const { data: admin } = await _supabase.from('admin_users').select('email').eq('email', user.email).maybeSingle();
+        if (!admin) { 
+            alert("🔒 Access Denied: Not an admin account"); 
+            await _supabase.auth.signOut();
+            document.getElementById('adminLoginOverlay').style.display = 'flex';
+            return; 
+        }
+        
+        document.getElementById('adminLoginOverlay').style.display = 'none';
         currentUser = user;
         document.getElementById('adminEmail').value = user.email;
+        showSection('profile');
+    }
+
+    async function submitAdminLogin(e) {
+        e.preventDefault();
+        const emailInput = document.getElementById('loginEmail').value.trim();
+        const passwordInput = document.getElementById('loginPassword').value;
+        const btn = document.getElementById('loginSubmitBtn');
+
+        btn.disabled = true;
+        btn.innerText = "Verifying Access...";
+
+        // Standard dynamic signature targeting your native profile parameters
+        const { data, error } = await _supabase.auth.signInWithPassword({ 
+            email: emailInput, 
+            password: passwordInput 
+        });
+
+        if (error) {
+            alert("Security Check Failed: " + error.message);
+            btn.disabled = false;
+            btn.innerText = "Sign In to Dashboard";
+        } else {
+            await checkAdmin();
+        }
     }
     
     async function updateAdminProfile() {
-        const newEmail = document.getElementById('adminEmail').value;
         const newPassword = document.getElementById('adminPassword').value;
-        const updates = {};
-        if (newEmail && newEmail !== currentUser.email) updates.email = newEmail;
-        if (newPassword) updates.password = newPassword;
-        if (Object.keys(updates).length === 0) { document.getElementById('profileMessage').innerText = "No changes made."; return; }
-        const { error } = await _supabase.auth.updateUser(updates);
+        if (!newPassword) { document.getElementById('profileMessage').innerText = "Please enter a new password."; return; }
+        
+        const { error } = await _supabase.auth.updateUser({ password: newPassword });
         if (error) document.getElementById('profileMessage').innerText = "Error: " + error.message;
-        else { document.getElementById('profileMessage').innerText = "Profile updated! Please login again."; setTimeout(() => logout(), 2000); }
+        else { document.getElementById('profileMessage').innerText = "Password updated! Please login again."; setTimeout(() => logout(), 2000); }
     }
     
-    // Upload image to Supabase Storage (public bucket)
     async function uploadImageToStorage(file, productId) {
         const fileExt = file.name.split('.').pop();
         const fileName = `product-${productId}-${Date.now()}.${fileExt}`;
@@ -137,14 +194,12 @@
         return publicUrl.publicUrl;
     }
     
-    // Delete image from storage (optional cleanup)
     async function deleteImageFromStorage(imageUrl) {
         if (!imageUrl || !imageUrl.includes('product-images')) return;
         const fileName = imageUrl.split('/').pop();
         await _supabase.storage.from('product-images').remove([fileName]);
     }
     
-    // Called when admin selects a file from gallery (add product)
     window.previewAndUpload = async (input) => {
         const file = input.files[0];
         if (!file) return;
@@ -152,7 +207,6 @@
         alert("Image selected. Click 'Add Product' to finish.");
     };
     
-    // Add product with optional image upload
     async function addProduct() {
         const name = document.getElementById('prodName').value.trim();
         const price = parseFloat(document.getElementById('prodPrice').value);
@@ -160,7 +214,6 @@
         const stock = parseInt(document.getElementById('prodStock').value);
         if (!name || isNaN(price) || isNaN(stock)) { alert("Name, price, and stock are required"); return; }
         
-        // Insert product first to get ID
         const { data: newProduct, error: insertError } = await _supabase
             .from('products')
             .insert([{ name, price, category, stock_quantity: stock, image_url: '' }])
@@ -168,7 +221,6 @@
             .single();
         if (insertError) { alert(insertError.message); return; }
         
-        // If an image was selected, upload it and update product
         if (tempProductFile) {
             try {
                 const publicUrl = await uploadImageToStorage(tempProductFile, newProduct.id);
@@ -176,7 +228,6 @@
                 tempProductFile = null;
             } catch (err) { console.error("Image upload failed", err); alert("Product added but image upload failed."); }
         }
-        // Clear form
         document.getElementById('prodName').value = '';
         document.getElementById('prodPrice').value = '';
         document.getElementById('prodCategory').value = '';
@@ -185,7 +236,6 @@
         loadProducts();
     }
     
-    // Inline updates
     async function updateProductPrice(id, newPrice) {
         if (isNaN(newPrice)) return;
         await _supabase.from('products').update({ price: parseFloat(newPrice) }).eq('id', id);
@@ -196,7 +246,6 @@
         loadProducts();
     }
     
-    // Update product image via file upload (inline)
     async function updateProductImageFromFile(id, input) {
         const file = input.files[0];
         if (!file) return;
@@ -208,24 +257,20 @@
         input.value = '';
     }
     
-    // Update product image via URL
     async function updateProductImageFromUrl(id, url) {
         if (!url) return;
         await _supabase.from('products').update({ image_url: url }).eq('id', id);
         loadProducts();
     }
     
-    // Delete product (and optionally its image)
     async function deleteProduct(id, imageUrl) {
         if (!confirm("Delete this product permanently?")) return;
-        // Delete from storage if image exists
         if (imageUrl && imageUrl.includes('product-images')) {
             try {
                 const fileName = imageUrl.split('/').pop();
                 await _supabase.storage.from('product-images').remove([fileName]);
             } catch(e) { console.warn("Could not delete image", e); }
         }
-        // Delete from database
         const { error } = await _supabase.from('products').delete().eq('id', id);
         if (error) alert(error.message);
         else loadProducts();
@@ -295,7 +340,9 @@
     
     async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
     
-    window.onload = async () => { await checkAdmin(); showSection('profile'); };
+    window.onload = async () => { 
+        await checkAdmin(); 
+    };
     if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(console.log); }
 </script>
 </body>
