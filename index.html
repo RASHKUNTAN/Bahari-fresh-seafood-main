@@ -4,97 +4,483 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Bahari Fresh | Premium Seafood</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui, sans-serif; }
-        :root { --primary: #0a5c4b; --secondary: #ffcd3c; --bg-light: #f9f7f3; }
-        body { background: var(--bg-light); color: #333; }
-        .navbar { background: var(--primary); padding: 1rem 5%; display: flex; justify-content: space-between; align-items: center; color: white; position: sticky; top: 0; z-index: 1000; }
-        .admin-link { background: white; color: var(--primary); padding: 6px 14px; border-radius: 40px; font-weight: bold; text-decoration: none; font-size: 0.8rem; }
-        .product-grid { padding: 20px 5%; display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 25px; }
-        .sidebar { position: fixed; top: 0; right: -100%; width: 350px; height: 100%; background: white; z-index: 2000; transition: 0.4s; box-shadow: -10px 0 30px rgba(0,0,0,0.1); display: flex; flex-direction: column; }
-        .sidebar.active { right: 0; }
-        .buy-btn { background: var(--primary); color: white; border: none; padding: 14px; border-radius: 40px; font-weight: 700; cursor: pointer; width: 100%; margin-top: 10px; }
-        .buy-btn:disabled { background: #ccc; cursor: not-allowed; }
-        
-        /* Auth Modal Styles */
-        .modal { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 3000; align-items: center; justify-content: center; padding: 20px; }
-        .modal.active { display: flex; }
-        .modal-content { background: white; padding: 30px; border-radius: 24px; width: 100%; max-width: 380px; text-align: center; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
-        .modal-content h2 { color: var(--primary); margin-bottom: 20px; }
-        .modal-content input { width: 100%; padding: 12px 16px; margin-bottom: 12px; border-radius: 12px; border: 1px solid #ddd; font-size: 1rem; outline: none; }
-        .modal-content input:focus { border-color: var(--primary); }
-        .modal-content p { font-size: 0.9rem; margin-top: 15px; cursor: pointer; color: #555; }
-        .modal-content p b { color: var(--primary); }
-        .close-modal-btn { background: none; border: none; color: #999; margin-top: 12px; cursor: pointer; font-weight: 600; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+        :root {
+            --ocean:    #0b4f3e;
+            --ocean-mid:#0e6b54;
+            --foam:     #f5f1ea;
+            --gold:     #e8a832;
+            --gold-lt:  #f9d98a;
+            --sand:     #d9cdb8;
+            --ink:      #1a1a18;
+            --body-txt: #3d3d38;
+            --white:    #ffffff;
+            --radius-card: 18px;
+            --radius-pill: 999px;
+            --transition: 0.3s cubic-bezier(0.4,0,0.2,1);
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            background: var(--foam);
+            color: var(--body-txt);
+            font-family: 'DM Sans', system-ui, sans-serif;
+            font-size: 16px;
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ── NAV ── */
+        .nav {
+            position: sticky; top: 0; z-index: 900;
+            background: var(--ocean);
+            display: flex; align-items: center; justify-content: space-between;
+            padding: 0 5%;
+            height: 68px;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.25);
+        }
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.45rem;
+            color: var(--white);
+            letter-spacing: 0.02em;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .nav-logo span { color: var(--gold); }
+        .nav-logo-wave { font-size: 1.6rem; }
+        .nav-actions { display: flex; align-items: center; gap: 14px; }
+
+        .btn-ghost {
+            background: none; border: 1.5px solid rgba(255,255,255,0.35);
+            color: var(--white); border-radius: var(--radius-pill);
+            padding: 7px 18px; font-family: 'DM Sans', sans-serif;
+            font-size: 0.82rem; font-weight: 500;
+            cursor: pointer; transition: var(--transition);
+            text-decoration: none; display: inline-block;
+        }
+        .btn-ghost:hover { border-color: var(--gold); color: var(--gold); }
+
+        .btn-admin {
+            background: var(--gold); color: var(--ocean);
+            border: none; border-radius: var(--radius-pill);
+            padding: 7px 18px; font-size: 0.8rem; font-weight: 700;
+            cursor: pointer; text-decoration: none; display: none;
+            font-family: 'DM Sans', sans-serif; transition: var(--transition);
+        }
+        .btn-admin:hover { background: var(--gold-lt); }
+
+        .cart-pill {
+            background: var(--gold); color: var(--ocean);
+            padding: 8px 18px; border-radius: var(--radius-pill);
+            font-weight: 700; font-size: 0.9rem;
+            cursor: pointer; display: flex; align-items: center; gap: 7px;
+            transition: var(--transition); border: none;
+            font-family: 'DM Sans', sans-serif;
+        }
+        .cart-pill:hover { background: var(--gold-lt); transform: translateY(-1px); }
+        .cart-count {
+            background: var(--ocean); color: var(--white);
+            width: 22px; height: 22px; border-radius: 50%;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 0.75rem; font-weight: 700; transition: var(--transition);
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, var(--ocean) 0%, var(--ocean-mid) 60%, #1a8a6a 100%);
+            padding: 80px 5% 70px;
+            position: relative; overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .hero-inner { position: relative; z-index: 1; max-width: 600px; }
+        .hero-eyebrow {
+            display: inline-flex; align-items: center; gap: 8px;
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.2);
+            padding: 5px 14px; border-radius: var(--radius-pill);
+            color: var(--gold-lt); font-size: 0.78rem; font-weight: 500;
+            letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 20px;
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2rem, 4.5vw, 3.2rem);
+            color: var(--white); line-height: 1.2;
+            margin-bottom: 16px;
+        }
+        .hero h1 em { color: var(--gold); font-style: italic; }
+        .hero-sub {
+            color: rgba(255,255,255,0.75); font-size: 1.05rem;
+            font-weight: 300; max-width: 440px;
+        }
+        .hero-badges {
+            display: flex; gap: 12px; flex-wrap: wrap; margin-top: 30px;
+        }
+        .badge {
+            background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+            color: rgba(255,255,255,0.85); border-radius: var(--radius-pill);
+            padding: 6px 14px; font-size: 0.8rem; font-weight: 400;
+        }
+
+        /* ── SECTION HEADER ── */
+        .section-header {
+            padding: 50px 5% 10px;
+            display: flex; align-items: flex-end; justify-content: space-between;
+            gap: 20px; flex-wrap: wrap;
+        }
+        .section-label {
+            font-size: 0.72rem; font-weight: 600; letter-spacing: 0.12em;
+            text-transform: uppercase; color: var(--gold); margin-bottom: 6px;
+        }
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.5rem, 3vw, 2.1rem);
+            color: var(--ink); line-height: 1.2;
+        }
+
+        /* ── PRODUCT GRID ── */
+        .product-grid {
+            padding: 24px 5% 60px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 24px;
+        }
+
+        .product-card {
+            background: var(--white); border-radius: var(--radius-card);
+            overflow: hidden; transition: var(--transition);
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            display: flex; flex-direction: column;
+            border: 1px solid rgba(0,0,0,0.05);
+        }
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 16px 40px rgba(0,0,0,0.12);
+        }
+        .product-img-wrap { position: relative; overflow: hidden; }
+        .product-img-wrap img {
+            width: 100%; height: 200px; object-fit: cover;
+            display: block; transition: transform 0.5s ease;
+        }
+        .product-card:hover .product-img-wrap img { transform: scale(1.06); }
+        .product-freshness {
+            position: absolute; top: 12px; left: 12px;
+            background: var(--ocean); color: var(--white);
+            font-size: 0.68rem; font-weight: 600; letter-spacing: 0.06em;
+            text-transform: uppercase; padding: 4px 10px;
+            border-radius: var(--radius-pill);
+        }
+        .product-body { padding: 18px 18px 20px; flex: 1; display: flex; flex-direction: column; }
+        .product-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.15rem; color: var(--ink); margin-bottom: 6px;
+        }
+        .product-desc { font-size: 0.83rem; color: #888; flex: 1; margin-bottom: 14px; }
+        .product-footer { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .product-price {
+            font-size: 1.1rem; font-weight: 700; color: var(--ocean);
+        }
+        .product-price small { font-size: 0.72rem; font-weight: 400; color: #aaa; }
+
+        .btn-add {
+            background: var(--ocean); color: var(--white);
+            border: none; border-radius: var(--radius-pill);
+            padding: 9px 18px; font-size: 0.85rem; font-weight: 600;
+            cursor: pointer; transition: var(--transition);
+            font-family: 'DM Sans', sans-serif; white-space: nowrap;
+        }
+        .btn-add:hover { background: var(--ocean-mid); transform: scale(1.03); }
+
+        /* ── TRUST STRIP ── */
+        .trust-strip {
+            background: var(--ocean); padding: 28px 5%;
+            display: flex; gap: 30px; justify-content: center;
+            flex-wrap: wrap;
+        }
+        .trust-item {
+            display: flex; align-items: center; gap: 10px;
+            color: rgba(255,255,255,0.85); font-size: 0.88rem;
+        }
+        .trust-icon { font-size: 1.4rem; }
+
+        /* ── CART SIDEBAR ── */
+        .cart-overlay {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.5); z-index: 1800;
+            backdrop-filter: blur(3px);
+        }
+        .cart-overlay.active { display: block; }
+
+        .cart-sidebar {
+            position: fixed; top: 0; right: -110%; width: 380px; max-width: 100%;
+            height: 100%; background: var(--white); z-index: 1900;
+            display: flex; flex-direction: column;
+            transition: right 0.4s cubic-bezier(0.4,0,0.2,1);
+            box-shadow: -8px 0 40px rgba(0,0,0,0.15);
+        }
+        .cart-sidebar.active { right: 0; }
+
+        .cart-head {
+            padding: 22px 22px 18px;
+            border-bottom: 1px solid #eee;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .cart-head h2 { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--ink); }
+        .cart-close {
+            background: #f0f0f0; border: none; width: 34px; height: 34px;
+            border-radius: 50%; font-size: 1.3rem; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
+            color: #555; transition: var(--transition);
+        }
+        .cart-close:hover { background: #e0e0e0; }
+
+        .cart-items { flex: 1; overflow-y: auto; padding: 18px 22px; }
+        .cart-empty {
+            text-align: center; padding: 60px 20px;
+            color: #bbb; font-size: 0.95rem;
+        }
+        .cart-empty-icon { font-size: 3rem; margin-bottom: 12px; display: block; }
+
+        .cart-item {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 12px 0; border-bottom: 1px solid #f5f5f5; gap: 10px;
+        }
+        .cart-item-name { font-weight: 500; font-size: 0.9rem; color: var(--ink); }
+        .cart-item-price { font-size: 0.8rem; color: #888; }
+        .cart-item-remove {
+            background: none; border: none; color: #ccc; font-size: 1.2rem;
+            cursor: pointer; padding: 4px; transition: color 0.2s; line-height: 1;
+        }
+        .cart-item-remove:hover { color: #e55; }
+
+        .cart-foot { padding: 18px 22px; border-top: 1px solid #eee; }
+        .cart-total {
+            display: flex; justify-content: space-between; margin-bottom: 16px;
+            font-weight: 700; color: var(--ink); font-size: 1.05rem;
+        }
+        .phone-input {
+            width: 100%; padding: 13px 16px;
+            border: 1.5px solid #ddd; border-radius: 12px;
+            font-size: 0.95rem; font-family: 'DM Sans', sans-serif;
+            outline: none; transition: border-color 0.2s; margin-bottom: 12px;
+        }
+        .phone-input:focus { border-color: var(--ocean); }
+        .phone-input::placeholder { color: #bbb; }
+
+        .btn-pay {
+            width: 100%; background: linear-gradient(135deg, var(--ocean), var(--ocean-mid));
+            color: var(--white); border: none; border-radius: 12px;
+            padding: 16px; font-size: 1rem; font-weight: 700;
+            cursor: pointer; transition: var(--transition);
+            font-family: 'DM Sans', sans-serif; letter-spacing: 0.03em;
+        }
+        .btn-pay:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+        .btn-pay:disabled { background: #ccc; cursor: not-allowed; transform: none; }
+
+        /* ── AUTH MODAL ── */
+        .modal-wrap {
+            display: none; position: fixed; inset: 0;
+            background: rgba(0,0,0,0.6); z-index: 2500;
+            align-items: center; justify-content: center; padding: 20px;
+            backdrop-filter: blur(4px);
+        }
+        .modal-wrap.active { display: flex; }
+        .modal-box {
+            background: var(--white); border-radius: 24px;
+            padding: 36px 32px; width: 100%; max-width: 400px;
+            text-align: center; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+        }
+        .modal-fish { font-size: 2.5rem; margin-bottom: 8px; display: block; }
+        .modal-box h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--ocean); font-size: 1.6rem; margin-bottom: 22px;
+        }
+        .modal-input {
+            width: 100%; padding: 13px 16px; margin-bottom: 12px;
+            border: 1.5px solid #ddd; border-radius: 12px;
+            font-size: 0.95rem; font-family: 'DM Sans', sans-serif;
+            outline: none; transition: border-color 0.2s;
+        }
+        .modal-input:focus { border-color: var(--ocean); }
+        .modal-switch {
+            font-size: 0.88rem; color: #777; margin-top: 18px; cursor: pointer;
+        }
+        .modal-switch b { color: var(--ocean); font-weight: 600; }
+        .modal-cancel {
+            background: none; border: none; color: #bbb; margin-top: 12px;
+            cursor: pointer; font-size: 0.85rem; font-weight: 600;
+            font-family: 'DM Sans', sans-serif; transition: color 0.2s;
+        }
+        .modal-cancel:hover { color: #888; }
+
+        /* ── FOOTER ── */
+        .footer {
+            background: var(--ink); color: rgba(255,255,255,0.5);
+            text-align: center; padding: 30px 5%; font-size: 0.82rem;
+        }
+        .footer strong { color: var(--gold); font-family: 'Playfair Display', serif; }
+
+        /* ── LOADING SKELETON ── */
+        @keyframes shimmer {
+            0% { background-position: -800px 0; }
+            100% { background-position: 800px 0; }
+        }
+        .skeleton {
+            background: linear-gradient(90deg, #ececec 25%, #f5f5f5 50%, #ececec 75%);
+            background-size: 800px 100%; animation: shimmer 1.5s infinite;
+            border-radius: var(--radius-card);
+        }
+        .skeleton-card { height: 300px; }
+
+        @media (max-width: 600px) {
+            .nav { padding: 0 4%; }
+            .hero { padding: 50px 4% 45px; }
+            .section-header, .product-grid { padding-left: 4%; padding-right: 4%; }
+            .cart-sidebar { width: 100%; }
+            .trust-strip { gap: 18px; }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.39.0/dist/umd/supabase.js"></script>
 </head>
 <body>
 
-<nav class="navbar">
-    <div style="font-size: 1.5rem; font-weight: 800;">⚓ BAHARI FRESH</div>
-    <div style="display: flex; gap: 15px; align-items: center;">
-        <a id="adminDashBtn" href="admin.html" style="display:none;" class="admin-link">ADMIN</a>
-        <span id="authBtn" onclick="handleAuthClick()" style="cursor:pointer; font-weight: 600;">Login</span>
-        <div onclick="toggleCart()" style="cursor:pointer; background:var(--secondary); color:var(--primary); padding:8px 15px; border-radius:40px; font-weight:800;">
-            🛒 Basket <span id="cart-count">0</span>
-        </div>
+<!-- NAV -->
+<nav class="nav">
+    <div class="nav-logo">
+        <span class="nav-logo-wave">🌊</span>
+        BAHARI <span>FRESH</span>
+    </div>
+    <div class="nav-actions">
+        <a id="adminDashBtn" href="admin.html" class="btn-admin">⚙ Admin</a>
+        <button id="authBtn" onclick="handleAuthClick()" class="btn-ghost">Login</button>
+        <button onclick="toggleCart()" class="cart-pill">
+            🛒 Basket <span id="cart-count" class="cart-count">0</span>
+        </button>
     </div>
 </nav>
 
-<div id="productGrid" class="product-grid"></div>
-
-<div id="authModal" class="modal">
-    <div class="modal-content">
-        <h2 id="modalTitle">Login</h2>
-        <form id="authForm" onsubmit="submitAuthForm(event)">
-            <input type="email" id="authEmail" placeholder="Email Address" required>
-            <input type="password" id="authPass" placeholder="Password" required>
-            <button type="submit" id="authSubmitBtn" class="buy-btn">Sign In</button>
-        </form>
-        <p id="authSwitch" style="margin-top:15px; cursor:pointer;" onclick="toggleAuthMode()">New to Bahari Fresh? <b>Create Account</b></p>
-        <button class="close-modal-btn" onclick="closeAuthModal()">Cancel</button>
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-inner">
+        <div class="hero-eyebrow">🐟 Fresh from the Indian Ocean</div>
+        <h1>Seafood so fresh,<br>you can <em>taste the tide.</em></h1>
+        <p class="hero-sub">Premium catches delivered to your door. Sourced daily from Kenyan waters.</p>
+        <div class="hero-badges">
+            <span class="badge">✓ Same-day delivery</span>
+            <span class="badge">✓ No preservatives</span>
+            <span class="badge">✓ Mpesa checkout</span>
+        </div>
     </div>
+</section>
+
+<!-- TRUST STRIP -->
+<div class="trust-strip">
+    <div class="trust-item"><span class="trust-icon">🎣</span> Catch-to-door in under 6 hours</div>
+    <div class="trust-item"><span class="trust-icon">❄️</span> Cold chain guaranteed</div>
+    <div class="trust-item"><span class="trust-icon">📍</span> Kilifi & Mombasa region</div>
+    <div class="trust-item"><span class="trust-icon">🔒</span> Secure Mpesa payments</div>
 </div>
 
-<aside id="cartSidebar" class="sidebar">
-    <div style="padding: 20px; border-bottom: 1px solid #eee; display: flex; justify-content: space-between;">
-        <h2>Basket</h2>
-        <span onclick="toggleCart()" style="cursor:pointer; font-size: 24px;">&times;</span>
+<!-- PRODUCTS -->
+<div class="section-header">
+    <div>
+        <div class="section-label">Today's Stock</div>
+        <h2 class="section-title">Fresh from the water</h2>
     </div>
-    <div id="cartItemsList" style="flex-grow: 1; padding: 20px; overflow-y: auto;"></div>
-    <div style="padding: 20px; border-top: 1px solid #eee;">
-        <h3 id="cartTotal">Total: KSh 0</h3>
-        <input type="tel" id="mpesaPhone" placeholder="2547XXXXXXXX" style="width: 100%; padding: 12px; margin: 10px 0; border-radius: 10px; border: 1px solid #ddd;">
-        <button id="payBtn" class="buy-btn" onclick="processCheckout()">CONFIRM & PAY</button>
+</div>
+<div id="productGrid" class="product-grid"></div>
+
+<!-- FOOTER -->
+<footer class="footer">
+    <p><strong>Bahari Fresh</strong> — Premium Seafood, Kenyan Coast &nbsp;|&nbsp; © 2025</p>
+</footer>
+
+<!-- CART OVERLAY + SIDEBAR -->
+<div class="cart-overlay" id="cartOverlay" onclick="toggleCart()"></div>
+<aside class="cart-sidebar" id="cartSidebar">
+    <div class="cart-head">
+        <h2>Your Basket</h2>
+        <button class="cart-close" onclick="toggleCart()">×</button>
+    </div>
+    <div class="cart-items" id="cartItemsList">
+        <div class="cart-empty">
+            <span class="cart-empty-icon">🧺</span>
+            Your basket is empty.<br>Add something fresh!
+        </div>
+    </div>
+    <div class="cart-foot">
+        <div class="cart-total">
+            <span>Total</span>
+            <span id="cartTotal">KSh 0</span>
+        </div>
+        <input type="tel" id="mpesaPhone" class="phone-input" placeholder="2547XXXXXXXX">
+        <button id="payBtn" class="btn-pay" onclick="processCheckout()">Confirm & Pay via Mpesa</button>
     </div>
 </aside>
+
+<!-- AUTH MODAL -->
+<div id="authModal" class="modal-wrap">
+    <div class="modal-box">
+        <span class="modal-fish">🐠</span>
+        <h2 id="modalTitle">Welcome back</h2>
+        <form id="authForm" onsubmit="submitAuthForm(event)">
+            <input type="email" id="authEmail" class="modal-input" placeholder="Email address" required>
+            <input type="password" id="authPass" class="modal-input" placeholder="Password" required>
+            <button type="submit" id="authSubmitBtn" class="btn-pay">Sign In</button>
+        </form>
+        <p class="modal-switch" id="authSwitch" onclick="toggleAuthMode()">New to Bahari Fresh? <b>Create account</b></p>
+        <button class="modal-cancel" onclick="closeAuthModal()">Cancel</button>
+    </div>
+</div>
 
 <script>
     const SUPABASE_URL = 'https://qhpzqtwzifgthwovkpwp.supabase.co';
     const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFocHpxdHd6aWZndGh3b3ZrcHdwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI4MjkzMzMsImV4cCI6MjA4ODQwNTMzM30.rgo0X-UWShZAAyvi9hRqSka44ZIJ-2GlvTNsxkFBKgU";
-    
     const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    let cart = [];
-    let allProducts = [];
-    let isLoginMode = true; 
-    let currentUser = null;
+    let cart = [], allProducts = [], isLoginMode = true, currentUser = null;
+
+        const freshTags = ['Just Landed', "Today's Catch", 'Morning Haul', 'Daily Fresh'];
+    const descs = {
+        default: 'Sourced fresh from the Indian Ocean, cleaned and ready to cook.'
+    };
 
     async function init() {
+        // Show skeletons while loading
+        const grid = document.getElementById('productGrid');
+        grid.innerHTML = Array(4).fill('<div class="skeleton skeleton-card"></div>').join('');
+
         const { data } = await _supabase.from('products').select('*');
-        if (data) {
+        if (data && data.length) {
             allProducts = data;
-            document.getElementById('productGrid').innerHTML = data.map(p => `
-                <div style="background:white; padding:15px; border-radius:20px; box-shadow:0 5px 15px rgba(0,0,0,0.05)">
-                    <img src="${p.image_url}" onerror="this.src='https://via.placeholder.com/250x180?text=No+Image'" style="width:100%; height:180px; object-fit:cover; border-radius:15px;">
-                    <h3 style="margin:10px 0">${p.name}</h3>
-                    <p style="font-weight:bold; color:var(--primary)">KSh ${p.price}</p>
-                    <button class="buy-btn" onclick="addToCart(${p.id})">Add to Basket</button>
+            grid.innerHTML = data.map((p, i) => `
+                <div class="product-card">
+                    <div class="product-img-wrap">
+                        <img src="${p.image_url || ''}" 
+                             onerror="this.src='https://placehold.co/400x220/0b4f3e/ffffff?text=🐟+Bahari+Fresh'" 
+                             alt="${p.name}" loading="lazy">
+                        <span class="product-freshness">${freshTags[i % freshTags.length]}</span>
+                    </div>
+                    <div class="product-body">
+                        <h3 class="product-name">${p.name}</h3>
+                        <p class="product-desc">${p.description || descs.default}</p>
+                        <div class="product-footer">
+                            <div class="product-price">KSh ${Number(p.price).toLocaleString()} <small>/kg</small></div>
+                            <button class="btn-add" onclick="addToCart(${p.id})">+ Basket</button>
+                        </div>
+                    </div>
                 </div>
             `).join('');
+        } else {
+            grid.innerHTML = '<p style="padding:40px 0;color:#aaa;grid-column:1/-1;text-align:center;">No products available right now. Check back soon!</p>';
         }
-        
+
         _supabase.auth.onAuthStateChange((event, session) => {
             currentUser = session?.user || null;
             updateAuthUI();
@@ -104,18 +490,11 @@
     function updateAuthUI() {
         const authBtn = document.getElementById('authBtn');
         const adminDashBtn = document.getElementById('adminDashBtn');
-        
         if (currentUser) {
             authBtn.innerText = `Logout (${currentUser.email.split('@')[0]})`;
-            
-            // 🛠️ CHANGED HERE: Now correctly targets your updated admin email identifier
-            if (currentUser.email === 'admin@baharifresh.com') {
-                adminDashBtn.style.display = 'inline-block';
-            } else {
-                adminDashBtn.style.display = 'none';
-            }
+            adminDashBtn.style.display = currentUser.email === 'admin@baharifresh.com' ? 'inline-block' : 'none';
         } else {
-            authBtn.innerText = "Login";
+            authBtn.innerText = 'Login';
             adminDashBtn.style.display = 'none';
         }
     }
@@ -137,17 +516,16 @@
     function toggleAuthMode() {
         isLoginMode = !isLoginMode;
         const title = document.getElementById('modalTitle');
-        const submitBtn = document.getElementById('authSubmitBtn');
-        const switchTxt = document.getElementById('authSwitch');
-
+        const btn = document.getElementById('authSubmitBtn');
+        const sw = document.getElementById('authSwitch');
         if (isLoginMode) {
-            title.innerText = "Login";
-            submitBtn.innerText = "Sign In";
-            switchTxt.innerHTML = "New to Bahari Fresh? <b>Create Account</b>";
+            title.innerText = 'Welcome back';
+            btn.innerText = 'Sign In';
+            sw.innerHTML = "New to Bahari Fresh? <b>Create account</b>";
         } else {
-            title.innerText = "Create Account";
-            submitBtn.innerText = "Sign Up";
-            switchTxt.innerHTML = "Already have an account? <b>Sign In</b>";
+            title.innerText = 'Create account';
+            btn.innerText = 'Sign Up';
+            sw.innerHTML = "Already have an account? <b>Sign in</b>";
         }
     }
 
@@ -155,26 +533,20 @@
         e.preventDefault();
         const email = document.getElementById('authEmail').value.trim();
         const password = document.getElementById('authPass').value;
-        const submitBtn = document.getElementById('authSubmitBtn');
+        const btn = document.getElementById('authSubmitBtn');
+        btn.disabled = true; btn.innerText = 'Please wait…';
 
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Please wait...";
+        const result = isLoginMode
+            ? await _supabase.auth.signInWithPassword({ email, password })
+            : await _supabase.auth.signUp({ email, password });
 
-        let result;
-        if (isLoginMode) {
-            result = await _supabase.auth.signInWithPassword({ email, password });
-        } else {
-            result = await _supabase.auth.signUp({ email, password });
-        }
+        btn.disabled = false;
+        btn.innerText = isLoginMode ? 'Sign In' : 'Sign Up';
 
-        submitBtn.disabled = false;
-        submitBtn.innerText = isLoginMode ? "Sign In" : "Sign Up";
-
-        if (result.error) {
-            alert(result.error.message);
-        } else {
-            if (!isLoginMode && result.data?.user && result.data.session === null) {
-                alert("Account created! Please check your email for a verification link.");
+        if (result.error) { alert(result.error.message); }
+        else {
+            if (!isLoginMode && result.data?.session === null) {
+                alert('Account created! Check your email to verify.');
             }
             closeAuthModal();
         }
@@ -184,57 +556,65 @@
         const p = allProducts.find(x => x.id === id);
         if (p) {
             cart.push(p);
-            updateCart();
+            renderCart();
+            // Flash the cart pill
+            const pill = document.querySelector('.cart-pill');
+            pill.style.transform = 'scale(1.12)';
+            setTimeout(() => pill.style.transform = '', 200);
         }
     }
 
-    function updateCart() {
-        document.getElementById('cart-count').innerText = cart.length;
-        const total = cart.reduce((sum, item) => sum + item.price, 0);
-        document.getElementById('cartTotal').innerText = `Total: KSh ${total.toLocaleString()}`;
-        document.getElementById('cartItemsList').innerHTML = cart.map((item, i) => `
-            <div style="display:flex; justify-content:space-between; margin-bottom:10px; background:#f9f9f9; padding:8px; border-radius:8px;">
-                <span>${item.name}</span>
-                <button onclick="cart.splice(${i},1); updateCart()" style="color:red; background:none; border:none; cursor:pointer; font-weight:bold;">&times;</button>
+    function renderCart() {
+        const count = document.getElementById('cart-count');
+        const total = cart.reduce((s, i) => s + Number(i.price), 0);
+        count.innerText = cart.length;
+        document.getElementById('cartTotal').innerText = `KSh ${total.toLocaleString()}`;
+        const list = document.getElementById('cartItemsList');
+        if (!cart.length) {
+            list.innerHTML = `<div class="cart-empty"><span class="cart-empty-icon">🧺</span>Your basket is empty.<br>Add something fresh!</div>`;
+            return;
+        }
+        list.innerHTML = cart.map((item, i) => `
+            <div class="cart-item">
+                <div>
+                    <div class="cart-item-name">${item.name}</div>
+                    <div class="cart-item-price">KSh ${Number(item.price).toLocaleString()}</div>
+                </div>
+                <button class="cart-item-remove" onclick="removeFromCart(${i})" title="Remove">×</button>
             </div>
         `).join('');
     }
 
-    function toggleCart() { document.getElementById('cartSidebar').classList.toggle('active'); }
+    function removeFromCart(i) {
+        cart.splice(i, 1);
+        renderCart();
+    }
+
+    function toggleCart() {
+        document.getElementById('cartSidebar').classList.toggle('active');
+        document.getElementById('cartOverlay').classList.toggle('active');
+    }
 
     async function processCheckout() {
         const phone = document.getElementById('mpesaPhone').value.trim();
-        const amount = cart.reduce((sum, item) => sum + item.price, 0);
-
-        if (!phone.startsWith('254') || phone.length !== 12) {
-            return alert("Invalid Phone! Use 2547XXXXXXXX");
-        }
-
-        if (amount === 0) return alert("Your basket is empty!");
+        const amount = cart.reduce((s, i) => s + Number(i.price), 0);
+        if (!phone.startsWith('254') || phone.length !== 12) return alert('Invalid phone number. Use format: 2547XXXXXXXX');
+        if (!amount) return alert('Your basket is empty!');
 
         const btn = document.getElementById('payBtn');
-        btn.innerText = "WAITING FOR PIN...";
-        btn.disabled = true;
+        btn.innerText = 'Waiting for PIN…'; btn.disabled = true;
 
         try {
             const { data, error } = await _supabase.functions.invoke('daraja-stk-push', {
-                body: { 
-                    phone: phone, 
-                    amount: amount,
-                    account: "Bahari-" + Math.floor(Math.random() * 1000)
-                }
+                body: { phone, amount, account: 'Bahari-' + Math.floor(Math.random() * 1000) }
             });
-
             if (error) throw error;
-
-            alert("Prompt Sent! Check your phone.");
-            cart = []; updateCart(); toggleCart();
+            alert('✅ Mpesa prompt sent! Check your phone.');
+            cart = []; renderCart(); toggleCart();
         } catch (err) {
-            console.error(err);
-            alert("Error: To prompt the user, you must deploy the Safaricom Daraja Edge Function on your Supabase dashboard.");
+            alert('Error: Deploy the Safaricom Daraja Edge Function in your Supabase dashboard to enable payments.');
         } finally {
-            btn.disabled = false;
-            btn.innerText = "CONFIRM & PAY";
+            btn.disabled = false; btn.innerText = 'Confirm & Pay via Mpesa';
         }
     }
 
