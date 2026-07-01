@@ -3,122 +3,434 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bahari Fresh - Admin Panel</title>
+    <title>🐠 Bahari Fresh — Ocean Admin</title>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0a5c4b">
+    <meta name="theme-color" content="#0b4b6f">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui; }
-        body { background: #f0f2f5; padding: 20px; }
-        .container { max-width: 1400px; margin: 0 auto; }
-        h1 { color: #0a5c4b; margin-bottom: 20px; }
-        .admin-nav { display: flex; gap: 20px; margin-bottom: 30px; flex-wrap: wrap; }
-        .admin-nav button { padding: 10px 20px; background: #0a5c4b; color: white; border: none; border-radius: 40px; cursor: pointer; }
-        .admin-nav button.active { background: #ffcd3c; color: #0a5c4b; font-weight: bold; }
-        .section { background: white; border-radius: 28px; padding: 25px; margin-bottom: 30px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
-        table { width: 100%; border-collapse: collapse; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid #eee; vertical-align: middle; }
-        th { background: #f8f9fa; }
-        input, select { padding: 8px 12px; border-radius: 12px; border: 1px solid #ddd; width: 100%; }
-        button { background: #0a5c4b; color: white; border: none; padding: 8px 16px; border-radius: 40px; cursor: pointer; }
-        .delete-btn { background: #c0392b; }
-        .add-form { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px,1fr)); gap: 15px; margin-bottom: 30px; align-items: end; }
-        .logout { float: right; background: #c0392b; margin-top: 10px; margin-left: 10px; }
-        .profile-card { background: #f8f9fa; padding: 20px; border-radius: 20px; margin-bottom: 30px; }
-        .profile-card input { margin-bottom: 10px; }
-        .img-preview { width: 50px; height: 50px; object-fit: cover; border-radius: 8px; }
-        .image-upload-cell { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
-        .image-upload-cell input[type="file"] { display: none; }
-        .image-upload-cell .upload-btn { background: #0a5c4b; color: white; padding: 6px 12px; border-radius: 20px; cursor: pointer; font-size: 12px; }
-        .image-upload-cell .url-input { width: 120px; }
-        .gallery-upload { background: #2c6e2f; margin-left: 5px; }
-        @media (max-width: 700px) { table { font-size: 12px; } .image-upload-cell { flex-direction: column; align-items: stretch; } }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --deep: #0b2b3f;
+            --abyss: #1a475c;
+            --wave: #2f7a92;
+            --foam: #b4d9e6;
+            --coral: #f28b7a;
+            --goldfish: #f7c56e;
+            --seafoam: #6fc1b0;
+            --pearl: #e7f0f5;
+            --drift: #d9d0c5;
+            --ink: #1f2e3a;
+            --white: #f9fcfe;
+            --danger: #dc6b5a;
+            --border: #cbdbe6;
+            --radius: 20px;
+            --pill: 999px;
+            --trans: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
+            --shadow: 0 12px 28px -8px rgba(6, 30, 45, 0.18);
+        }
+        body { background: linear-gradient(145deg, #e2edf2 0%, #c7dbe6 100%); font-family: 'DM Sans', system-ui, sans-serif; color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-        /* Admin Gateway Overlay Panel Styles */
-        .login-overlay { position: fixed; inset: 0; background: rgba(10, 92, 75, 0.98); z-index: 9999; display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: white; padding: 40px; border-radius: 28px; width: 100%; max-width: 400px; text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.2); }
-        .login-card h2 { color: #0a5c4b; margin-bottom: 10px; }
-        .login-card p { color: #666; margin-bottom: 25px; font-size: 0.9rem; }
-        .login-card input { margin-bottom: 15px; padding: 12px; font-size: 1rem; }
-        .login-card button { width: 100%; padding: 14px; font-size: 1rem; font-weight: bold; margin-top: 5px; }
+        /* TOP BAR — ocean gradient with shimmer */
+        .topbar {
+            background: linear-gradient(130deg, var(--deep) 0%, var(--abyss) 40%, var(--wave) 80%);
+            padding: 0 32px; height: 68px;
+            display: flex; align-items: center; justify-content: space-between;
+            position: sticky; top: 0; z-index: 800;
+            box-shadow: 0 4px 18px rgba(7, 40, 58, 0.3);
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .topbar-logo { font-family: 'Playfair Display', serif; color: var(--white); font-size: 1.45rem; display: flex; align-items: center; gap: 10px; letter-spacing: 0.02em; }
+        .topbar-logo span { color: var(--goldfish); }
+        .topbar-logo small { font-size: 0.75rem; font-family: 'DM Sans', sans-serif; color: var(--foam); font-weight: 400; margin-left: 6px; letter-spacing: 0.04em; }
+        .topbar-right { display: flex; gap: 12px; align-items: center; }
+        .topbar-email { color: rgba(255,255,255,0.75); font-size: 0.8rem; background: rgba(0,0,0,0.18); padding: 4px 14px; border-radius: 30px; backdrop-filter: blur(2px); }
+        .btn-logout {
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.25);
+            color: var(--white); padding: 8px 20px; border-radius: var(--pill);
+            font-size: 0.8rem; font-weight: 600; cursor: pointer;
+            font-family: 'DM Sans', sans-serif; transition: var(--trans);
+            backdrop-filter: blur(2px);
+        }
+        .btn-logout:hover { background: var(--coral); border-color: var(--coral); color: white; }
+
+        /* LAYOUT */
+        .layout { display: flex; min-height: calc(100vh - 68px); }
+
+        /* SIDENAV — deep sea */
+        .sidenav {
+            width: 230px; background: linear-gradient(180deg, var(--deep) 0%, #0f3a4f 100%);
+            padding: 32px 14px; border-right: 1px solid rgba(255,255,255,0.06);
+            display: flex; flex-direction: column; gap: 6px;
+            flex-shrink: 0;
+            backdrop-filter: blur(2px);
+        }
+        .sidenav-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--foam); opacity: 0.6; padding: 4px 12px; margin-top: 6px; }
+        .nav-btn {
+            display: flex; align-items: center; gap: 12px;
+            padding: 12px 16px; border-radius: 16px;
+            background: none; border: none; color: var(--drift);
+            font-size: 0.9rem; font-weight: 500; cursor: pointer;
+            font-family: 'DM Sans', sans-serif; width: 100%; text-align: left;
+            transition: var(--trans);
+        }
+        .nav-btn:hover { background: rgba(255,255,255,0.06); color: white; transform: translateX(4px); }
+        .nav-btn.active { background: linear-gradient(120deg, var(--wave), #3b92b0); color: white; font-weight: 600; box-shadow: 0 6px 18px rgba(30, 110, 140, 0.35); }
+        .nav-btn .nav-icon { font-size: 1.2rem; width: 24px; text-align: center; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
+
+        /* MAIN */
+        .main { flex: 1; padding: 36px 32px; overflow-x: hidden; background: rgba(255,255,255,0.35); backdrop-filter: blur(2px); }
+
+        /* PAGE TITLE */
+        .page-title { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--deep); margin-bottom: 2px; letter-spacing: -0.02em; }
+        .page-sub { color: #1e4b60; font-size: 0.9rem; margin-bottom: 28px; opacity: 0.8; font-weight: 400; }
+
+        /* STAT STRIP — ocean gems */
+        .stat-strip { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 28px; }
+        .stat-chip {
+            flex: 1; min-width: 150px; border-radius: 20px; padding: 18px 22px;
+            color: white; box-shadow: var(--shadow);
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        .stat-chip.c1 { background: linear-gradient(135deg, #145c7a, #2f8aa8); }
+        .stat-chip.c2 { background: linear-gradient(135deg, #1b7a72, #44b8a3); }
+        .stat-chip.c3 { background: linear-gradient(135deg, #b8653a, #e8966a); }
+        .stat-chip.c4 { background: linear-gradient(135deg, #5f6c8a, #9ba3c7); }
+        .stat-chip .stat-num { font-size: 1.8rem; font-weight: 700; font-family: 'Playfair Display', serif; letter-spacing: 0.02em; }
+        .stat-chip .stat-label { font-size: 0.72rem; opacity: 0.8; margin-top: 4px; letter-spacing: 0.04em; }
+
+        /* CARDS — pearl white */
+        .card {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(8px);
+            border-radius: var(--radius);
+            padding: 28px 30px; box-shadow: var(--shadow);
+            border: 1px solid rgba(255,255,255,0.6);
+            margin-bottom: 28px;
+            transition: var(--trans);
+        }
+        .card:hover { background: rgba(255, 255, 255, 0.8); }
+        .card-title {
+            font-family: 'Playfair Display', serif; font-size: 1.2rem;
+            color: var(--deep); margin-bottom: 22px; padding-bottom: 14px;
+            border-bottom: 2px solid rgba(43, 108, 130, 0.15);
+            display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+        }
+
+        /* FORM ELEMENTS */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; align-items: end; }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-label { font-size: 0.7rem; font-weight: 700; color: #1f5a70; text-transform: uppercase; letter-spacing: 0.08em; }
+        .form-input {
+            padding: 11px 16px; border: 1.5px solid rgba(43, 108, 130, 0.2); border-radius: 14px;
+            font-size: 0.9rem; font-family: 'DM Sans', sans-serif; outline: none;
+            transition: var(--trans); background: rgba(255,255,255,0.6); color: var(--ink);
+        }
+        .form-input:focus { border-color: var(--wave); box-shadow: 0 0 0 4px rgba(47, 122, 146, 0.15); background: white; }
+        .form-input:disabled { background: #eef4f8; color: #5b6f7a; }
+
+        /* BUTTONS — ocean inspired */
+        .btn {
+            display: inline-flex; align-items: center; gap: 8px;
+            padding: 10px 22px; border-radius: var(--pill); border: none;
+            font-size: 0.85rem; font-weight: 600; cursor: pointer;
+            font-family: 'DM Sans', sans-serif; transition: var(--trans);
+            white-space: nowrap;
+        }
+        .btn-primary { background: linear-gradient(120deg, var(--deep), var(--wave)); color: white; box-shadow: 0 4px 10px rgba(11, 43, 63, 0.2); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(11, 43, 63, 0.3); filter: brightness(1.05); }
+        .btn-danger { background: rgba(200, 70, 60, 0.12); color: var(--danger); border: 1px solid rgba(220, 107, 90, 0.3); }
+        .btn-danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
+        .btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
+        .btn-sm { padding: 6px 14px; font-size: 0.75rem; }
+        .btn-upload {
+            background: rgba(47, 122, 146, 0.08); color: var(--wave); border: 1.5px dashed var(--wave);
+            padding: 8px 16px; border-radius: 14px; cursor: pointer; font-size: 0.8rem;
+            font-family: 'DM Sans', sans-serif; font-weight: 600; transition: var(--trans);
+        }
+        .btn-upload:hover { background: var(--wave); color: white; border-color: var(--wave); }
+
+        /* TABLE — clean ocean */
+        .table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid rgba(43, 108, 130, 0.12); background: rgba(255,255,255,0.4); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
+        thead { background: rgba(11, 43, 63, 0.04); backdrop-filter: blur(4px); }
+        th { padding: 14px 18px; text-align: left; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--abyss); border-bottom: 1px solid rgba(43, 108, 130, 0.1); }
+        td { padding: 14px 18px; border-bottom: 1px solid rgba(43, 108, 130, 0.05); vertical-align: middle; color: var(--ink); }
+        tbody tr:last-child td { border-bottom: none; }
+        tbody tr:hover td { background: rgba(47, 122, 146, 0.04); }
+        tbody tr.row-selected td { background: rgba(47, 122, 146, 0.08); }
+
+        .row-check { width: 18px; height: 18px; cursor: pointer; accent-color: var(--wave); }
+
+        .img-preview { width: 54px; height: 54px; object-fit: cover; border-radius: 14px; border: 2px solid rgba(255,255,255,0.6); box-shadow: 0 4px 8px rgba(0,0,0,0.04); }
+        .table-input { padding: 8px 12px; border: 1.5px solid rgba(43, 108, 130, 0.15); border-radius: 12px; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none; transition: var(--trans); background: rgba(255,255,255,0.5); }
+        .table-input:focus { border-color: var(--wave); background: white; box-shadow: 0 0 0 3px rgba(47, 122, 146, 0.1); }
+
+        /* BADGES */
+        .badge { display: inline-block; padding: 4px 12px; border-radius: var(--pill); font-size: 0.7rem; font-weight: 600; }
+        .badge-green { background: #c5e8e0; color: #0e6d5e; }
+        .badge-gold { background: #f7e3b4; color: #a1772a; }
+        .badge-violet { background: #d9d4f0; color: #4f3f8a; }
+
+        /* MESSAGE */
+        .msg { margin-top: 14px; font-size: 0.85rem; padding: 12px 18px; border-radius: 16px; }
+        .msg.ok { background: #c5e8e0; color: #0e6d5e; }
+        .msg.err { background: #fae2dd; color: var(--danger); }
+
+        /* BULK BAR */
+        .bulk-bar {
+            display: none; align-items: center; gap: 14px;
+            background: var(--deep); color: white; padding: 10px 24px;
+            border-radius: var(--pill); margin-bottom: 18px;
+            animation: slideDown 0.25s ease;
+            width: fit-content;
+            box-shadow: 0 4px 14px rgba(11, 43, 63, 0.25);
+        }
+        .bulk-bar.show { display: flex; }
+        .bulk-bar span { font-size: 0.85rem; font-weight: 500; }
+        @keyframes slideDown { from { opacity:0; transform:translateY(-8px);} to {opacity:1; transform:translateY(0);} }
+
+        /* LOGIN OVERLAY — underwater dream */
+        .login-overlay {
+            position: fixed; inset: 0; z-index: 9999;
+            background: radial-gradient(circle at 20% 30%, #144c66, #082f40 70%, #021e2b);
+            display: none; align-items: center; justify-content: center; padding: 20px;
+            overflow: hidden;
+        }
+        .login-overlay.show { display: flex; }
+        .bubble {
+            position: absolute; border-radius: 50%;
+            background: rgba(255,255,255,0.07);
+            animation: floatUp linear infinite;
+            border: 1px solid rgba(255,255,255,0.03);
+        }
+        @keyframes floatUp {
+            0% { transform: translateY(0) translateX(0); opacity: 0; }
+            15% { opacity: 0.8; }
+            85% { opacity: 0.8; }
+            100% { transform: translateY(-120vh) translateX(30px); opacity: 0; }
+        }
+
+        .login-card {
+            position: relative; z-index: 2;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 32px;
+            padding: 48px 40px; width: 100%; max-width: 400px; text-align: center;
+            box-shadow: 0 40px 80px rgba(0,0,0,0.5);
+            animation: cardEnter 0.7s cubic-bezier(0.34,1.56,0.64,1);
+            border: 1px solid rgba(255,255,255,0.3);
+        }
+        @keyframes cardEnter {
+            from { opacity: 0; transform: translateY(40px) scale(0.94); }
+            to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        .login-fish { font-size: 3rem; margin-bottom: 8px; display: block; animation: bob 4s ease-in-out infinite; }
+        @keyframes bob {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-10px) rotate(-3deg); }
+        }
+        .login-card h2 { font-family: 'Playfair Display', serif; color: var(--deep); font-size: 1.8rem; margin-bottom: 6px; }
+        .login-card p { color: #3d6b7c; font-size: 0.85rem; margin-bottom: 30px; }
+        .login-input {
+            width: 100%; padding: 14px 18px; margin-bottom: 14px;
+            border: 1.5px solid rgba(43, 108, 130, 0.2); border-radius: 16px;
+            font-size: 0.95rem; font-family: 'DM Sans', sans-serif; outline: none;
+            transition: var(--trans); background: rgba(255,255,255,0.5);
+        }
+        .login-input:focus { border-color: var(--wave); box-shadow: 0 0 0 4px rgba(47, 122, 146, 0.12); background: white; }
+        .btn-login {
+            width: 100%; padding: 16px; background: linear-gradient(120deg, var(--deep), var(--wave));
+            color: white; border: none; border-radius: 16px; font-size: 1rem;
+            font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif;
+            transition: var(--trans); margin-top: 4px; box-shadow: 0 6px 20px rgba(11, 43, 63, 0.25);
+        }
+        .btn-login:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(11, 43, 63, 0.35); filter: brightness(1.04); }
+        .btn-login:disabled { background: #a0b8c4; cursor: not-allowed; }
+        .btn-back-store { background: none; border: none; color: #3d6b7c; margin-top: 16px; cursor: pointer; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; transition: color 0.2s; }
+        .btn-back-store:hover { color: var(--deep); }
+
+        .upload-cell { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+        .upload-cell input[type="file"] { display: none; }
+
+        @media (max-width: 768px) {
+            .sidenav { display: none; }
+            .main { padding: 20px 16px; }
+            .topbar { padding: 0 16px; }
+        }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 
-<div id="adminLoginOverlay" class="login-overlay" style="display: none;">
+<!-- LOGIN OVERLAY -->
+<div id="adminLoginOverlay" class="login-overlay">
+    <div id="bubbleField"></div>
     <div class="login-card">
-        <h2>⚓ Admin Gateway</h2>
-        <p>Log in with your administrator email account credentials</p>
+        <span class="login-fish">🐠</span>
+        <h2>Ocean Gateway</h2>
+        <p>Sign in to manage the catch</p>
         <form id="adminLoginForm" onsubmit="submitAdminLogin(event)">
-            <input type="email" id="loginEmail" placeholder="Admin Email" required>
-            <input type="password" id="loginPassword" placeholder="Password" required>
-            <button type="submit" id="loginSubmitBtn">Sign In to Dashboard</button>
+            <input type="email" id="loginEmail" class="login-input" placeholder="Admin email" required>
+            <input type="password" id="loginPassword" class="login-input" placeholder="Password" required>
+            <button type="submit" id="loginSubmitBtn" class="btn-login">Dive In</button>
         </form>
-        <button onclick="window.location.href='index.html'" style="background: none; color: #777; margin-top: 15px; font-weight: normal;">← Back to Store</button>
+        <button onclick="window.location.href='index.html'" class="btn-back-store">← Back to Store</button>
     </div>
 </div>
 
-<div class="container">
-    <h1>⚓ Bahari Fresh - Admin Dashboard</h1>
-    <div style="text-align:right;">
-        <button class="logout" onclick="logout()">Logout</button>
+<!-- TOP BAR -->
+<div class="topbar">
+    <div class="topbar-logo">🌊 BAHARI <span>FRESH</span> <small>admin · reef</small></div>
+    <div class="topbar-right">
+        <span class="topbar-email" id="topbarEmail"></span>
+        <button class="btn-logout" onclick="logout()">Sign Out</button>
     </div>
-    <div class="admin-nav">
-        <button id="btnProfile" class="active" onclick="showSection('profile')">My Profile</button>
-        <button id="btnProducts" onclick="showSection('products')">Products</button>
-        <button id="btnOrders" onclick="showSection('orders')">Orders</button>
-        <button id="btnUsers" onclick="showSection('users')">Users</button>
-    </div>
-    
-    <div id="profileSection" class="section">
-        <h2>Admin Profile Settings</h2>
-        <div class="profile-card">
-            <label>Admin Email Account</label>
-            <input type="email" id="adminEmail" placeholder="Admin Email" disabled>
-            <label>New Password (leave blank to keep current)</label>
-            <input type="password" id="adminPassword" placeholder="New Password">
-            <button onclick="updateAdminProfile()">Update Profile</button>
-            <p id="profileMessage" style="margin-top:10px;"></p>
-        </div>
-    </div>
-    
-    <div id="productsSection" class="section" style="display:none;">
-        <h2>Manage Products</h2>
-        <div class="add-form">
-            <input type="text" id="prodName" placeholder="Product Name (e.g., Kingfish)" required>
-            <input type="number" id="prodPrice" placeholder="Price per kg (KSh)" required>
-            <input type="text" id="prodCategory" placeholder="Category (Fish, Shellfish, Other)">
-            <input type="number" id="prodStock" placeholder="Stock (kg)" required>
-            <div style="display: flex; gap: 8px;">
-                <label class="upload-btn" style="background:#0a5c4b; color:white; padding:8px 16px; border-radius:40px; cursor:pointer;">📁 Choose from Gallery
-                    <input type="file" id="prodImageFile" accept="image/*" style="display:none;" onchange="previewAndUpload(this)">
-                </label>
+</div>
+
+<div class="layout">
+    <!-- SIDE NAV -->
+    <nav class="sidenav">
+        <span class="sidenav-label">Dashboard</span>
+        <button id="btnProfile" class="nav-btn active" onclick="showSection('profile')"><span class="nav-icon">🐚</span> My Profile</button>
+        <button id="btnProducts" class="nav-btn" onclick="showSection('products')"><span class="nav-icon">🐟</span> Products</button>
+        <button id="btnOrders" class="nav-btn" onclick="showSection('orders')"><span class="nav-icon">📦</span> Orders</button>
+        <button id="btnUsers" class="nav-btn" onclick="showSection('users')"><span class="nav-icon">🦈</span> Admin Users</button>
+    </nav>
+
+    <!-- MAIN CONTENT -->
+    <main class="main">
+
+        <!-- PROFILE -->
+        <div id="profileSection">
+            <div class="page-title">My Profile</div>
+            <div class="page-sub">Manage your admin account settings</div>
+            <div class="card">
+                <div class="card-title">Account Details</div>
+                <div class="form-grid" style="max-width:500px;">
+                    <div class="form-group">
+                        <label class="form-label">Admin Email</label>
+                        <input type="email" id="adminEmail" class="form-input" placeholder="Admin Email" disabled>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">New Password</label>
+                        <input type="password" id="adminPassword" class="form-input" placeholder="Leave blank to keep current">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="updateAdminProfile()">Update Password</button>
+                <div id="profileMessage"></div>
             </div>
-            <button onclick="addProduct()">➕ Add Product</button>
         </div>
-        <div style="overflow-x:auto;">
-            <table id="productsTable">
-                <thead>
-                    <tr><th>Image</th><th>Name</th><th>Price (KSh/kg)</th><th>Category</th><th>Stock (kg)</th><th>Actions</th></tr>
-                </thead>
-                <tbody></tbody>
-            </table>
+
+        <!-- PRODUCTS -->
+        <div id="productsSection" style="display:none;">
+            <div class="page-title">Products</div>
+            <div class="page-sub">Add, edit, and manage your seafood listings</div>
+
+            <div class="stat-strip">
+                <div class="stat-chip c1"><div class="stat-num" id="statTotalProducts">—</div><div class="stat-label">Total Products</div></div>
+                <div class="stat-chip c2"><div class="stat-num" id="statTotalStock">—</div><div class="stat-label">Total Stock (kg)</div></div>
+                <div class="stat-chip c3"><div class="stat-num" id="statAvgPrice">—</div><div class="stat-label">Avg Price (KSh)</div></div>
+            </div>
+
+            <div class="card">
+                <div class="card-title">Add New Product</div>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label">Product Name</label>
+                        <input type="text" id="prodName" class="form-input" placeholder="e.g. Kingfish">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Price (KSh/kg)</label>
+                        <input type="number" id="prodPrice" class="form-input" placeholder="e.g. 650">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Category</label>
+                        <input type="text" id="prodCategory" class="form-input" placeholder="Fish / Shellfish">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Stock (kg)</label>
+                        <input type="number" id="prodStock" class="form-input" placeholder="e.g. 20">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">Product Image</label>
+                        <label class="btn-upload">📁 Choose Image
+                            <input type="file" id="prodImageFile" accept="image/*" onchange="previewAndUpload(this)">
+                        </label>
+                    </div>
+                    <div class="form-group" style="justify-content:flex-end;">
+                        <button class="btn btn-primary" onclick="addProduct()">＋ Add Product</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">
+                    <span>All Products</span>
+                    <span id="selectionCount" style="font-size:0.75rem;color:#2f7a92;font-weight:500;"></span>
+                </div>
+
+                <div id="bulkBar" class="bulk-bar">
+                    <span id="bulkCountText">0 selected</span>
+                    <button class="btn btn-danger btn-sm" onclick="deleteSelectedProducts()">🗑 Delete Selected</button>
+                    <button class="btn btn-sm" style="background:rgba(255,255,255,0.1);color:white;" onclick="clearSelection()">Cancel</button>
+                </div>
+
+                <div class="table-wrap">
+                    <table id="productsTable">
+                        <thead><tr>
+                            <th style="width:36px;"><input type="checkbox" class="row-check" id="selectAllCheck" onchange="toggleSelectAll(this)"></th>
+                            <th>Image</th><th>Name</th><th>Price (KSh/kg)</th><th>Category</th><th>Stock (kg)</th><th>Actions</th>
+                        </tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-    </div>
-    
-    <div id="ordersSection" class="section" style="display:none;">
-        <h2>Customer Orders</h2>
-        <div style="overflow-x:auto;"><table id="ordersTable"><thead><tr><th>Phone</th><th>Items</th><th>Total (KSh)</th><th>Status</th><th>Date</th></tr></thead><tbody></tbody></table></div>
-    </div>
-    
-    <div id="usersSection" class="section" style="display:none;">
-        <h2>Manage Admin Users</h2>
-        <div class="add-form">
-            <input type="email" id="newAdminEmail" placeholder="User Email to make admin">
-            <button onclick="addAdmin()">➕ Add Admin</button>
+
+        <!-- ORDERS -->
+        <div id="ordersSection" style="display:none;">
+            <div class="page-title">Orders</div>
+            <div class="page-sub">View all customer orders</div>
+            <div class="card">
+                <div class="card-title">Recent Orders</div>
+                <div class="table-wrap">
+                    <table id="ordersTable">
+                        <thead><tr><th>Phone</th><th>Items</th><th>Total (KSh)</th><th>Status</th><th>Date</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
         </div>
-        <div style="overflow-x:auto;"><table id="adminsTable"><thead><tr><th>Email</th><th>Role</th><th>Actions</th></tr></thead><tbody></tbody></table></div>
-    </div>
+
+        <!-- USERS -->
+        <div id="usersSection" style="display:none;">
+            <div class="page-title">Admin Users</div>
+            <div class="page-sub">Manage who has access to this dashboard</div>
+            <div class="card">
+                <div class="card-title">Add Admin</div>
+                <div class="form-grid" style="max-width:480px;">
+                    <div class="form-group">
+                        <label class="form-label">Email Address</label>
+                        <input type="email" id="newAdminEmail" class="form-input" placeholder="user@example.com">
+                    </div>
+                    <div class="form-group" style="justify-content:flex-end;">
+                        <button class="btn btn-primary" onclick="addAdmin()">＋ Add Admin</button>
+                    </div>
+                </div>
+            </div>
+            <div class="card">
+                <div class="card-title">Current Admins</div>
+                <div class="table-wrap">
+                    <table id="adminsTable">
+                        <thead><tr><th>Email</th><th>Role</th><th>Action</th></tr></thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </main>
 </div>
 
 <script>
@@ -127,223 +439,273 @@
     const _supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     let currentUser = null;
     let tempProductFile = null;
-    
+    let allProductsCache = [];
+    let selectedProductIds = new Set();
+
+    function spawnBubbles() {
+        const field = document.getElementById('bubbleField');
+        if (!field) return;
+        field.innerHTML = '';
+        const count = 22;
+        for (let i = 0; i < count; i++) {
+            const b = document.createElement('div');
+            const size = 8 + Math.random() * 28;
+            b.className = 'bubble';
+            b.style.width = size + 'px';
+            b.style.height = size + 'px';
+            b.style.left = Math.random() * 100 + '%';
+            b.style.bottom = '-50px';
+            b.style.animationDuration = (10 + Math.random() * 14) + 's';
+            b.style.animationDelay = (Math.random() * 12) + 's';
+            field.appendChild(b);
+        }
+    }
+
     async function checkAdmin() {
         const { data: { user } } = await _supabase.auth.getUser();
-        
-        // If no user exists, pull open the login interface card container layer
-        if (!user) { 
-            document.getElementById('adminLoginOverlay').style.display = 'flex';
-            return; 
+        if (!user) {
+            document.getElementById('adminLoginOverlay').classList.add('show');
+            spawnBubbles();
+            return;
         }
-        
-        // Confirm the profile entry exists in the whitelist table
         const { data: admin } = await _supabase.from('admin_users').select('email').eq('email', user.email).maybeSingle();
-        if (!admin) { 
-            alert("🔒 Access Denied: Not an admin account"); 
+        if (!admin) {
+            alert("🔒 Access Denied: Not an admin account");
             await _supabase.auth.signOut();
-            document.getElementById('adminLoginOverlay').style.display = 'flex';
-            return; 
+            window.location.href = 'index.html';
+            return;
         }
-        
-        document.getElementById('adminLoginOverlay').style.display = 'none';
+        document.getElementById('adminLoginOverlay').classList.remove('show');
         currentUser = user;
         document.getElementById('adminEmail').value = user.email;
+        document.getElementById('topbarEmail').innerText = user.email;
         showSection('profile');
     }
 
     async function submitAdminLogin(e) {
         e.preventDefault();
-        const emailInput = document.getElementById('loginEmail').value.trim();
-        const passwordInput = document.getElementById('loginPassword').value;
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
         const btn = document.getElementById('loginSubmitBtn');
-
-        btn.disabled = true;
-        btn.innerText = "Verifying Access...";
-
-        // Standard dynamic signature targeting your native profile parameters
-        const { data, error } = await _supabase.auth.signInWithPassword({ 
-            email: emailInput, 
-            password: passwordInput 
-        });
-
-        if (error) {
-            alert("Security Check Failed: " + error.message);
-            btn.disabled = false;
-            btn.innerText = "Sign In to Dashboard";
-        } else {
-            await checkAdmin();
-        }
+        btn.disabled = true; btn.innerText = 'Diving…';
+        const { error } = await _supabase.auth.signInWithPassword({ email, password });
+        if (error) { alert('Login failed: ' + error.message); btn.disabled = false; btn.innerText = 'Dive In'; }
+        else await checkAdmin();
     }
-    
+
     async function updateAdminProfile() {
         const newPassword = document.getElementById('adminPassword').value;
-        if (!newPassword) { document.getElementById('profileMessage').innerText = "Please enter a new password."; return; }
-        
+        const msg = document.getElementById('profileMessage');
+        if (!newPassword || newPassword.length < 6) { showMsg(msg, 'Password must be at least 6 characters.', true); return; }
         const { error } = await _supabase.auth.updateUser({ password: newPassword });
-        if (error) document.getElementById('profileMessage').innerText = "Error: " + error.message;
-        else { document.getElementById('profileMessage').innerText = "Password updated! Please login again."; setTimeout(() => logout(), 2000); }
+        if (error) showMsg(msg, 'Error: ' + error.message, true);
+        else { showMsg(msg, '✅ Password updated! Signing you out…', false); setTimeout(() => logout(), 2000); }
     }
-    
+
+    function showMsg(el, text, isError) {
+        el.className = 'msg ' + (isError ? 'err' : 'ok');
+        el.innerText = text;
+    }
+
     async function uploadImageToStorage(file, productId) {
-        const fileExt = file.name.split('.').pop();
-        const fileName = `product-${productId}-${Date.now()}.${fileExt}`;
-        const { data, error } = await _supabase.storage.from('product-images').upload(fileName, file);
+        const ext = file.name.split('.').pop();
+        const fileName = `product-${productId}-${Date.now()}.${ext}`;
+        const { error } = await _supabase.storage.from('product-images').upload(fileName, file);
         if (error) throw error;
-        const { data: publicUrl } = _supabase.storage.from('product-images').getPublicUrl(fileName);
-        return publicUrl.publicUrl;
+        const { data } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+        return data.publicUrl;
     }
-    
-    async function deleteImageFromStorage(imageUrl) {
-        if (!imageUrl || !imageUrl.includes('product-images')) return;
-        const fileName = imageUrl.split('/').pop();
-        await _supabase.storage.from('product-images').remove([fileName]);
-    }
-    
+
     window.previewAndUpload = async (input) => {
         const file = input.files[0];
         if (!file) return;
         tempProductFile = file;
-        alert("Image selected. Click 'Add Product' to finish.");
+        alert('Image selected. Click "Add Product" to save.');
     };
-    
+
     async function addProduct() {
         const name = document.getElementById('prodName').value.trim();
         const price = parseFloat(document.getElementById('prodPrice').value);
         const category = document.getElementById('prodCategory').value.trim();
         const stock = parseInt(document.getElementById('prodStock').value);
-        if (!name || isNaN(price) || isNaN(stock)) { alert("Name, price, and stock are required"); return; }
-        
-        const { data: newProduct, error: insertError } = await _supabase
-            .from('products')
-            .insert([{ name, price, category, stock_quantity: stock, image_url: '' }])
-            .select()
-            .single();
-        if (insertError) { alert(insertError.message); return; }
-        
+        if (!name || isNaN(price) || isNaN(stock)) { alert('Name, price, and stock are required'); return; }
+        const { data: newProduct, error } = await _supabase.from('products').insert([{ name, price, category, stock_quantity: stock, image_url: '' }]).select().single();
+        if (error) { alert(error.message); return; }
         if (tempProductFile) {
             try {
-                const publicUrl = await uploadImageToStorage(tempProductFile, newProduct.id);
-                await _supabase.from('products').update({ image_url: publicUrl }).eq('id', newProduct.id);
+                const url = await uploadImageToStorage(tempProductFile, newProduct.id);
+                await _supabase.from('products').update({ image_url: url }).eq('id', newProduct.id);
                 tempProductFile = null;
-            } catch (err) { console.error("Image upload failed", err); alert("Product added but image upload failed."); }
+            } catch (err) { alert('Product added but image upload failed.'); }
         }
-        document.getElementById('prodName').value = '';
-        document.getElementById('prodPrice').value = '';
-        document.getElementById('prodCategory').value = '';
-        document.getElementById('prodStock').value = '';
+        ['prodName','prodPrice','prodCategory','prodStock'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('prodImageFile').value = '';
         loadProducts();
     }
-    
-    async function updateProductPrice(id, newPrice) {
-        if (isNaN(newPrice)) return;
-        await _supabase.from('products').update({ price: parseFloat(newPrice) }).eq('id', id);
-        loadProducts();
-    }
-    async function updateProductStock(id, newStock) {
-        await _supabase.from('products').update({ stock_quantity: parseInt(newStock) }).eq('id', id);
-        loadProducts();
-    }
-    
+
+    async function updateProductPrice(id, val) { if (!isNaN(val)) await _supabase.from('products').update({ price: parseFloat(val) }).eq('id', id); }
+    async function updateProductStock(id, val) { await _supabase.from('products').update({ stock_quantity: parseInt(val) }).eq('id', id); }
+
     async function updateProductImageFromFile(id, input) {
-        const file = input.files[0];
-        if (!file) return;
-        try {
-            const publicUrl = await uploadImageToStorage(file, id);
-            await _supabase.from('products').update({ image_url: publicUrl }).eq('id', id);
-            loadProducts();
-        } catch (err) { alert("Image upload failed"); }
+        const file = input.files[0]; if (!file) return;
+        try { const url = await uploadImageToStorage(file, id); await _supabase.from('products').update({ image_url: url }).eq('id', id); loadProducts(); }
+        catch (err) { alert('Image upload failed'); }
         input.value = '';
     }
-    
-    async function updateProductImageFromUrl(id, url) {
-        if (!url) return;
-        await _supabase.from('products').update({ image_url: url }).eq('id', id);
-        loadProducts();
-    }
-    
+
     async function deleteProduct(id, imageUrl) {
-        if (!confirm("Delete this product permanently?")) return;
+        if (!confirm('Delete this product permanently?')) return;
         if (imageUrl && imageUrl.includes('product-images')) {
-            try {
-                const fileName = imageUrl.split('/').pop();
-                await _supabase.storage.from('product-images').remove([fileName]);
-            } catch(e) { console.warn("Could not delete image", e); }
+            try { await _supabase.storage.from('product-images').remove([imageUrl.split('/').pop()]); } catch(e) {}
         }
         const { error } = await _supabase.from('products').delete().eq('id', id);
-        if (error) alert(error.message);
-        else loadProducts();
+        if (error) alert(error.message); else loadProducts();
     }
-    
+
+    // ── BULK SELECT / DELETE ──
+    function toggleRowSelect(id, checked) {
+        if (checked) selectedProductIds.add(id); else selectedProductIds.delete(id);
+        updateBulkBar();
+        const row = document.querySelector(`tr[data-id="${id}"]`);
+        if (row) row.classList.toggle('row-selected', checked);
+    }
+
+    function toggleSelectAll(master) {
+        const checks = document.querySelectorAll('.row-check[data-row]');
+        checks.forEach(c => {
+            c.checked = master.checked;
+            toggleRowSelect(c.dataset.row, master.checked);
+        });
+    }
+
+    function clearSelection() {
+        selectedProductIds.clear();
+        document.querySelectorAll('.row-check[data-row]').forEach(c => c.checked = false);
+        document.querySelectorAll('tr.row-selected').forEach(r => r.classList.remove('row-selected'));
+        const master = document.getElementById('selectAllCheck');
+        if (master) master.checked = false;
+        updateBulkBar();
+    }
+
+    function updateBulkBar() {
+        const bar = document.getElementById('bulkBar');
+        const text = document.getElementById('bulkCountText');
+        const count = selectedProductIds.size;
+        if (count > 0) {
+            bar.classList.add('show');
+            text.innerText = `${count} selected`;
+        } else {
+            bar.classList.remove('show');
+        }
+    }
+
+    async function deleteSelectedProducts() {
+        const count = selectedProductIds.size;
+        if (!count) return;
+        if (!confirm(`Delete ${count} selected product${count > 1 ? 's' : ''} permanently?`)) return;
+
+        const idsToDelete = Array.from(selectedProductIds);
+        const imagesToRemove = idsToDelete
+            .map(id => allProductsCache.find(p => p.id === id)?.image_url)
+            .filter(url => url && url.includes('product-images'))
+            .map(url => url.split('/').pop());
+
+        if (imagesToRemove.length) {
+            try { await _supabase.storage.from('product-images').remove(imagesToRemove); } catch(e) {}
+        }
+
+        const { error } = await _supabase.from('products').delete().in('id', idsToDelete);
+        if (error) { alert(error.message); return; }
+        selectedProductIds.clear();
+        loadProducts();
+    }
+
     async function loadProducts() {
-        const { data, error } = await _supabase.from('products').select('*').order('name');
-        if (error) return;
-        const tbody = document.querySelector('#productsTable tbody');
-        tbody.innerHTML = data.map(p => `
-            <tr>
-                <td><img src="${p.image_url || '/images/placeholder.jpg'}" class="img-preview" onerror="this.src='/images/placeholder.jpg'"></td>
-                <td>${p.name}</td>
-                <td><input type="number" value="${p.price}" style="width:100px;" onchange="updateProductPrice('${p.id}', this.value)"></td>
-                <td>${p.category || '-'}</td>
-                <td><input type="number" value="${p.stock_quantity}" style="width:80px;" onchange="updateProductStock('${p.id}', this.value)"></td>
+        const { data } = await _supabase.from('products').select('*').order('name');
+        if (!data) return;
+        allProductsCache = data;
+        selectedProductIds.clear();
+        updateBulkBar();
+
+        document.getElementById('statTotalProducts').innerText = data.length;
+        document.getElementById('statTotalStock').innerText = data.reduce((s, p) => s + (Number(p.stock_quantity) || 0), 0).toLocaleString();
+        document.getElementById('statAvgPrice').innerText = data.length ? Math.round(data.reduce((s, p) => s + Number(p.price), 0) / data.length).toLocaleString() : '0';
+
+        document.querySelector('#productsTable tbody').innerHTML = data.map(p => `
+            <tr data-id="${p.id}">
+                <td><input type="checkbox" class="row-check" data-row="${p.id}" onchange="toggleRowSelect('${p.id}', this.checked)"></td>
+                <td><img src="${p.image_url || ''}" class="img-preview" onerror="this.src='https://placehold.co/54x54/1a5b78/fff?text=🐟'"></td>
+                <td><strong>${p.name}</strong></td>
+                <td><input class="table-input" type="number" value="${p.price}" style="width:90px;" onchange="updateProductPrice('${p.id}', this.value)"></td>
+                <td>${p.category ? `<span class="badge badge-violet">${p.category}</span>` : '—'}</td>
+                <td><input class="table-input" type="number" value="${p.stock_quantity}" style="width:75px;" onchange="updateProductStock('${p.id}', this.value)"></td>
                 <td>
-                    <div class="image-upload-cell">
-                        <label class="upload-btn" style="background:#0a5c4b; color:white; padding:4px 8px; border-radius:20px; cursor:pointer; font-size:12px;">📷 Gallery
-                            <input type="file" accept="image/*" style="display:none;" onchange="updateProductImageFromFile('${p.id}', this)">
+                    <div class="upload-cell">
+                        <label class="btn btn-sm" style="background:rgba(47,122,146,0.08);color:var(--wave);border:1px solid var(--wave);cursor:pointer;">📷 Image
+                            <input type="file" accept="image/*" onchange="updateProductImageFromFile('${p.id}', this)">
                         </label>
-                        <input type="text" class="url-input" placeholder="Image URL" style="width:100px;" onblur="updateProductImageFromUrl('${p.id}', this.value)">
-                        <button class="delete-btn" onclick="deleteProduct('${p.id}', '${p.image_url || ''}')">Delete</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}', '${p.image_url || ''}')">Delete</button>
                     </div>
                 </td>
             </tr>
         `).join('');
     }
-    
+
     async function loadOrders() {
-        const { data, error } = await _supabase.from('orders').select('*').order('created_at', { ascending: false });
-        if (error) return;
-        const tbody = document.querySelector('#ordersTable tbody');
-        tbody.innerHTML = data.map(o => `<tr><td>${o.customer_phone}</td><td>${o.items.substring(0,50)}${o.items.length>50?'...':''}</td><td>KSh ${o.total_price.toLocaleString()}</td><td>${o.status}</td><td>${new Date(o.created_at).toLocaleString()}</td>`).join('');
+        const { data } = await _supabase.from('orders').select('*').order('created_at', { ascending: false });
+        if (!data) return;
+        document.querySelector('#ordersTable tbody').innerHTML = data.map(o => `
+            <tr>
+                <td>${o.customer_phone}</td>
+                <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.items}</td>
+                <td><strong>KSh ${Number(o.total_price).toLocaleString()}</strong></td>
+                <td><span class="badge ${o.status === 'paid' ? 'badge-green' : 'badge-gold'}">${o.status}</span></td>
+                <td style="color:#1f5a70;font-size:0.8rem;">${new Date(o.created_at).toLocaleString()}</td>
+            </tr>
+        `).join('');
     }
-    
+
     async function loadAdmins() {
-        const { data, error } = await _supabase.from('admin_users').select('*');
-        if (error) return;
-        const tbody = document.querySelector('#adminsTable tbody');
-        tbody.innerHTML = data.map(admin => `<tr><td>${admin.email}</td><td>Admin</td><td><button class="delete-btn" onclick="removeAdmin('${admin.email}')">Remove</button></td>`).join('');
+        const { data } = await _supabase.from('admin_users').select('*');
+        if (!data) return;
+        document.querySelector('#adminsTable tbody').innerHTML = data.map(a => `
+            <tr>
+                <td>${a.email}</td>
+                <td><span class="badge badge-green">Admin</span></td>
+                <td><button class="btn btn-danger btn-sm" onclick="removeAdmin('${a.email}')">Remove</button></td>
+            </tr>
+        `).join('');
     }
+
     async function addAdmin() {
         const email = document.getElementById('newAdminEmail').value.trim();
-        if (!email) { alert("Enter email"); return; }
+        if (!email) { alert('Enter an email'); return; }
         const { error } = await _supabase.from('admin_users').insert([{ email }]);
         if (error) alert(error.message);
         else { loadAdmins(); document.getElementById('newAdminEmail').value = ''; }
     }
+
     async function removeAdmin(email) {
-        if (email === currentUser.email) { alert("You cannot remove yourself"); return; }
+        if (email === currentUser?.email) { alert('You cannot remove yourself'); return; }
         await _supabase.from('admin_users').delete().eq('email', email);
         loadAdmins();
     }
-    
+
     function showSection(section) {
-        document.getElementById('profileSection').style.display = section === 'profile' ? 'block' : 'none';
-        document.getElementById('productsSection').style.display = section === 'products' ? 'block' : 'none';
-        document.getElementById('ordersSection').style.display = section === 'orders' ? 'block' : 'none';
-        document.getElementById('usersSection').style.display = section === 'users' ? 'block' : 'none';
-        ['btnProfile','btnProducts','btnOrders','btnUsers'].forEach(id => document.getElementById(id).classList.remove('active'));
-        document.getElementById(`btn${section.charAt(0).toUpperCase()+section.slice(1)}`).classList.add('active');
+        ['profile','products','orders','users'].forEach(s => {
+            document.getElementById(s + 'Section').style.display = s === section ? 'block' : 'none';
+            const btn = document.getElementById('btn' + s.charAt(0).toUpperCase() + s.slice(1));
+            if (btn) btn.classList.toggle('active', s === section);
+        });
         if (section === 'products') loadProducts();
         if (section === 'orders') loadOrders();
         if (section === 'users') loadAdmins();
     }
-    
+
     async function logout() { await _supabase.auth.signOut(); window.location.href = 'index.html'; }
-    
-    window.onload = async () => { 
-        await checkAdmin(); 
-    };
-    if ('serviceWorker' in navigator) { navigator.serviceWorker.register('/sw.js').catch(console.log); }
+
+    window.onload = checkAdmin;
+    if ('serviceWorker' in navigator) navigator.serviceWorker.register('/sw.js').catch(() => {});
 </script>
 </body>
 </html>

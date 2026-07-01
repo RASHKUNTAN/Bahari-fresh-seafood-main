@@ -4,8 +4,8 @@ const router = express.Router();
 const axios = require('axios');
 
 // Safaricom Daraja Credentials Placeholder Keys
-const CONSUMER_KEY = rQFWBNUt0FKSx3rq4zaM49gdTQAUAwFvjTMdPqKsE4dn3vXL;
-const CONSUMER_SECRET = KxcDmRLSALbHmxEvzlhUGjgISLRwF8y4PMtaWSsZaAzKkGrK2SpWICYctKWOQmXu;
+const CONSUMER_KEY = "rQFWBNUt0FKSx3rq4zaM49gdTQAUAwFvjTMdPqKsE4dn3vXL";
+const CONSUMER_SECRET = "KxcDmRLSALbHmxEvzlhUGjgISLRwF8y4PMtaWSsZaAzKkGrK2SpWICYctKWOQmXu";
 const SHORTCODE = "174379"; // Default test Lipa Na M-Pesa passbook shortcode
 const PASSKEY = "bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2cbe9";
 

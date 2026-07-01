@@ -3,23 +3,70 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verified - Bahari Fresh</title>
+    <title>Email Verified — Bahari Fresh</title>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0a5c4b">
+    <meta name="theme-color" content="#0c4a7a">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: system-ui; }
-        body { background: #f9f7f3; display: flex; justify-content: center; align-items: center; min-height: 100vh; }
-        .container { background: white; padding: 40px; border-radius: 32px; text-align: center; }
-        h2 { color: #0a5c4b; margin-bottom: 20px; }
-        a { color: #0a5c4b; text-decoration: none; font-weight: bold; }
+        *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --ocean: #0c4a7a;
+            --ocean-mid: #1668a8;
+            --accent: #2f9fd6;
+            --foam: #eef5fb;
+            --gold: #e8a832;
+            --ink: #1a1a18;
+        }
+        body {
+            font-family: 'DM Sans', system-ui, sans-serif;
+            background: linear-gradient(135deg, var(--ocean) 0%, var(--ocean-mid) 55%, var(--accent) 100%);
+            display: flex; justify-content: center; align-items: center;
+            min-height: 100vh; padding: 20px; position: relative; overflow: hidden;
+        }
+        body::before {
+            content: '';
+            position: absolute; inset: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+        }
+        .container {
+            position: relative; z-index: 1;
+            background: white; padding: 48px 40px;
+            border-radius: 28px; text-align: center;
+            max-width: 420px; width: 100%;
+            box-shadow: 0 30px 60px rgba(0,0,0,0.25);
+        }
+        .check-badge {
+            width: 72px; height: 72px; border-radius: 50%;
+            background: linear-gradient(135deg, #2e9e6b, #45c887);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; color: white; margin: 0 auto 20px;
+            box-shadow: 0 10px 24px rgba(46,158,107,0.35);
+        }
+        h2 {
+            font-family: 'Playfair Display', serif;
+            color: var(--ocean); font-size: 1.5rem; margin-bottom: 12px;
+        }
+        p { color: #777; font-size: 0.95rem; line-height: 1.6; margin-bottom: 28px; }
+        a.btn-store {
+            display: inline-block; width: 100%;
+            background: linear-gradient(135deg, var(--ocean), var(--ocean-mid));
+            color: white; text-decoration: none; font-weight: 700;
+            padding: 15px; border-radius: 14px; font-size: 0.95rem;
+            transition: opacity 0.25s;
+        }
+        a.btn-store:hover { opacity: 0.9; }
+        .footnote { margin-top: 20px; font-size: 0.78rem; color: #bbb; }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
 <div class="container">
-    <h2>✅ Email Verified</h2>
-    <p>Your email has been successfully verified. You can now login.</p>
-    <br><a href="index.html">Go to Bahari Fresh</a>
+    <div class="check-badge">✓</div>
+    <h2>Email Verified</h2>
+    <p>Your email has been successfully verified. You're all set to start ordering the freshest catches from the coast.</p>
+    <a href="index.html" class="btn-store">Go to Bahari Fresh →</a>
+    <div class="footnote">🌊 Bahari Fresh — Premium Seafood</div>
 </div>
 <script>
     const SUPABASE_URL = 'https://qhpzqtwzifgthwovkpwp.supabase.co';

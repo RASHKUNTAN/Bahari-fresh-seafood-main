@@ -10,9 +10,9 @@
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
         :root {
-            --ocean:    #0b4f3e;
-            --ocean-mid:#0e6b54;
-            --foam:     #f5f1ea;
+            --ocean:    #0c4a7a;
+            --ocean-mid:#1668a8;
+            --foam:     #eef5fb;
             --gold:     #e8a832;
             --gold-lt:  #f9d98a;
             --sand:     #d9cdb8;
@@ -91,7 +91,7 @@
 
         /* ── HERO ── */
         .hero {
-            background: linear-gradient(135deg, var(--ocean) 0%, var(--ocean-mid) 60%, #1a8a6a 100%);
+            background: linear-gradient(135deg, var(--ocean) 0%, var(--ocean-mid) 60%, #2f9fd6 100%);
             padding: 80px 5% 70px;
             position: relative; overflow: hidden;
         }
@@ -398,7 +398,7 @@
 
 <!-- FOOTER -->
 <footer class="footer">
-    <p><strong>Bahari Fresh</strong> — Premium Seafood, Kenyan Coast &nbsp;|&nbsp; © 2025</p>
+    <p><strong>Bahari Fresh</strong> — Premium Seafood, Kenyan Coast &nbsp;|&nbsp; © 2026</p>
 </footer>
 
 <!-- CART OVERLAY + SIDEBAR -->
@@ -596,28 +596,74 @@
     }
 
     async function processCheckout() {
-        const phone = document.getElementById('mpesaPhone').value.trim();
-        const amount = cart.reduce((s, i) => s + Number(i.price), 0);
-        if (!phone.startsWith('254') || phone.length !== 12) return alert('Invalid phone number. Use format: 2547XXXXXXXX');
-        if (!amount) return alert('Your basket is empty!');
-
-        const btn = document.getElementById('payBtn');
-        btn.innerText = 'Waiting for PIN…'; btn.disabled = true;
-
-        try {
-            const { data, error } = await _supabase.functions.invoke('daraja-stk-push', {
-                body: { phone, amount, account: 'Bahari-' + Math.floor(Math.random() * 1000) }
-            });
-            if (error) throw error;
-            alert('✅ Mpesa prompt sent! Check your phone.');
-            cart = []; renderCart(); toggleCart();
-        } catch (err) {
-            alert('Error: Deploy the Safaricom Daraja Edge Function in your Supabase dashboard to enable payments.');
-        } finally {
-            btn.disabled = false; btn.innerText = 'Confirm & Pay via Mpesa';
-        }
+    const phone = document.getElementById('mpesaPhone').value.trim();
+    const amount = cart.reduce((s, i) => s + Number(i.price), 0);
+    
+    // Better phone validation
+    const cleanPhone = phone.replace(/\s/g, '');
+    if (!cleanPhone.startsWith('254') || cleanPhone.length !== 12 || !/^254\d{9}$/.test(cleanPhone)) {
+        alert('Invalid phone number. Use format: 2547XXXXXXXX (e.g., 254712345678)');
+        return;
+    }
+    
+    if (!amount || amount < 1) {
+        alert('Your basket is empty!');
+        return;
     }
 
+    const btn = document.getElementById('payBtn');
+    btn.innerText = '⏳ Processing...';
+    btn.disabled = true;
+
+    try {
+        console.log('Sending payment request...');
+        
+        const { data, error } = await _supabase.functions.invoke('hyper-service', {
+            body: { 
+                phone: cleanPhone, 
+                amount: amount,
+                account: `Bahari-${Date.now().toString().slice(-6)}`
+            }
+        });
+
+        // Check for function invocation error
+        if (error) {
+            console.error('Function invocation error:', error);
+            // Check if it's a CORS error
+            if (error.message?.includes('CORS') || error.message?.includes('preflight')) {
+                throw new Error('CORS error: The Edge Function is not properly configured. Please contact support.');
+            }
+            throw new Error(error.message || 'Payment request failed');
+        }
+
+        // Check for application error
+        if (!data) {
+            throw new Error('No response from payment service');
+        }
+
+        console.log('Payment response:', data);
+
+        if (data.error) {
+            console.error('Payment error:', data);
+            throw new Error(data.message || data.error || 'Payment request declined');
+        }
+
+        if (data.success && data.responseCode === '0') {
+            alert(`✅ Payment request sent!\n\nCheck your phone for the M-Pesa PIN prompt.\nReference: ${data.checkoutRequestID || 'N/A'}`);
+            cart = [];
+            renderCart();
+            toggleCart();
+        } else {
+            throw new Error(data.customerMessage || data.message || 'Payment request was declined');
+        }
+    } catch (err) {
+        console.error('Checkout error:', err);
+        alert(`❌ Payment failed: ${err.message || 'Unknown error'}`);
+    } finally {
+        btn.disabled = false;
+        btn.innerText = 'Confirm & Pay via Mpesa';
+    }
+}
     window.onload = init;
 </script>
 </body>
