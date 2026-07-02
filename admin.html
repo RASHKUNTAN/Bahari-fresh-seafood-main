@@ -3,254 +3,315 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🐠 Bahari Fresh — Ocean Admin</title>
+    <title>Bahari Fresh — Admin Dashboard</title>
     <link rel="manifest" href="/manifest.json">
-    <meta name="theme-color" content="#0b4b6f">
+    <meta name="theme-color" content="#0c4a7a">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --deep: #0b2b3f;
-            --abyss: #1a475c;
-            --wave: #2f7a92;
-            --foam: #b4d9e6;
-            --coral: #f28b7a;
-            --goldfish: #f7c56e;
-            --seafoam: #6fc1b0;
-            --pearl: #e7f0f5;
-            --drift: #d9d0c5;
-            --ink: #1f2e3a;
-            --white: #f9fcfe;
-            --danger: #dc6b5a;
-            --border: #cbdbe6;
-            --radius: 20px;
-            --pill: 999px;
-            --trans: 0.3s cubic-bezier(0.2, 0.9, 0.4, 1);
-            --shadow: 0 12px 28px -8px rgba(6, 30, 45, 0.18);
+            --ocean:    #0c4a7a;
+            --ocean-mid:#1668a8;
+            --accent:   #2f9fd6;
+            --coral:    #ff7a59;
+            --teal:     #18b89d;
+            --violet:   #8b5cf6;
+            --foam:     #eef5fb;
+            --gold:     #e8a832;
+            --gold-lt:  #fdf3d8;
+            --ink:      #1a1a18;
+            --body-txt: #3d3d38;
+            --white:    #ffffff;
+            --danger:   #e8503f;
+            --border:   #e7eef5;
+            --radius:   16px;
+            --pill:     999px;
+            --trans:    0.25s cubic-bezier(0.4,0,0.2,1);
+            --shadow:   0 4px 20px rgba(12,74,122,0.08);
         }
-        body { background: linear-gradient(145deg, #e2edf2 0%, #c7dbe6 100%); font-family: 'DM Sans', system-ui, sans-serif; color: var(--ink); min-height: 100vh; -webkit-font-smoothing: antialiased; }
+        body { background: linear-gradient(180deg, #eef6fc 0%, #f4eefc 100%); font-family: 'DM Sans', system-ui, sans-serif; color: var(--body-txt); min-height: 100vh; -webkit-font-smoothing: antialiased; }
 
-        /* TOP BAR — ocean gradient with shimmer */
+        /* ── TOP BAR ── */
         .topbar {
-            background: linear-gradient(130deg, var(--deep) 0%, var(--abyss) 40%, var(--wave) 80%);
-            padding: 0 32px; height: 68px;
+            background: linear-gradient(120deg, var(--ocean), var(--ocean-mid) 60%, var(--accent));
+            padding: 0 32px; height: 64px;
             display: flex; align-items: center; justify-content: space-between;
             position: sticky; top: 0; z-index: 800;
-            box-shadow: 0 4px 18px rgba(7, 40, 58, 0.3);
-            border-bottom: 1px solid rgba(255,255,255,0.08);
+            box-shadow: 0 2px 16px rgba(12,74,122,0.25);
         }
-        .topbar-logo { font-family: 'Playfair Display', serif; color: var(--white); font-size: 1.45rem; display: flex; align-items: center; gap: 10px; letter-spacing: 0.02em; }
-        .topbar-logo span { color: var(--goldfish); }
-        .topbar-logo small { font-size: 0.75rem; font-family: 'DM Sans', sans-serif; color: var(--foam); font-weight: 400; margin-left: 6px; letter-spacing: 0.04em; }
-        .topbar-right { display: flex; gap: 12px; align-items: center; }
-        .topbar-email { color: rgba(255,255,255,0.75); font-size: 0.8rem; background: rgba(0,0,0,0.18); padding: 4px 14px; border-radius: 30px; backdrop-filter: blur(2px); }
+        .topbar-logo { font-family: 'Playfair Display', serif; color: var(--white); font-size: 1.25rem; display: flex; align-items: center; gap: 10px; }
+        .topbar-logo span { color: var(--gold); }
+        .topbar-right { display: flex; gap: 10px; align-items: center; }
+        .topbar-email { color: rgba(255,255,255,0.7); font-size: 0.82rem; }
         .btn-logout {
-            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.25);
-            color: var(--white); padding: 8px 20px; border-radius: var(--pill);
+            background: rgba(255,255,255,0.12); border: 1px solid rgba(255,255,255,0.25);
+            color: var(--white); padding: 7px 16px; border-radius: var(--pill);
             font-size: 0.8rem; font-weight: 600; cursor: pointer;
             font-family: 'DM Sans', sans-serif; transition: var(--trans);
-            backdrop-filter: blur(2px);
         }
-        .btn-logout:hover { background: var(--coral); border-color: var(--coral); color: white; }
+        .btn-logout:hover { background: var(--coral); border-color: var(--coral); }
 
-        /* LAYOUT */
-        .layout { display: flex; min-height: calc(100vh - 68px); }
+        /* ── LAYOUT ── */
+        .layout { display: flex; min-height: calc(100vh - 64px); }
 
-        /* SIDENAV — deep sea */
+        /* ── SIDEBAR NAV ── */
         .sidenav {
-            width: 230px; background: linear-gradient(180deg, var(--deep) 0%, #0f3a4f 100%);
-            padding: 32px 14px; border-right: 1px solid rgba(255,255,255,0.06);
+            width: 220px; background: var(--white);
+            padding: 28px 16px; border-right: 1px solid var(--border);
             display: flex; flex-direction: column; gap: 6px;
             flex-shrink: 0;
-            backdrop-filter: blur(2px);
         }
-        .sidenav-label { font-size: 0.6rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--foam); opacity: 0.6; padding: 4px 12px; margin-top: 6px; }
+        .sidenav-label { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #bbb; padding: 4px 12px; margin-top: 8px; }
         .nav-btn {
-            display: flex; align-items: center; gap: 12px;
-            padding: 12px 16px; border-radius: 16px;
-            background: none; border: none; color: var(--drift);
+            display: flex; align-items: center; gap: 10px;
+            padding: 10px 14px; border-radius: 12px;
+            background: none; border: none; color: var(--body-txt);
             font-size: 0.9rem; font-weight: 500; cursor: pointer;
             font-family: 'DM Sans', sans-serif; width: 100%; text-align: left;
             transition: var(--trans);
         }
-        .nav-btn:hover { background: rgba(255,255,255,0.06); color: white; transform: translateX(4px); }
-        .nav-btn.active { background: linear-gradient(120deg, var(--wave), #3b92b0); color: white; font-weight: 600; box-shadow: 0 6px 18px rgba(30, 110, 140, 0.35); }
-        .nav-btn .nav-icon { font-size: 1.2rem; width: 24px; text-align: center; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.1)); }
+        .nav-btn:hover { background: var(--foam); color: var(--ocean); }
+        .nav-btn.active { background: linear-gradient(120deg, var(--ocean), var(--accent)); color: var(--white); font-weight: 600; box-shadow: 0 4px 14px rgba(12,74,122,0.25); }
+        .nav-btn .nav-icon { font-size: 1rem; width: 20px; text-align: center; }
 
-        /* MAIN */
-        .main { flex: 1; padding: 36px 32px; overflow-x: hidden; background: rgba(255,255,255,0.35); backdrop-filter: blur(2px); }
+        /* ── MAIN ── */
+        .main { flex: 1; padding: 32px; overflow-x: hidden; }
 
-        /* PAGE TITLE */
-        .page-title { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--deep); margin-bottom: 2px; letter-spacing: -0.02em; }
-        .page-sub { color: #1e4b60; font-size: 0.9rem; margin-bottom: 28px; opacity: 0.8; font-weight: 400; }
+        /* ── PAGE TITLE ── */
+        .page-title { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--ink); margin-bottom: 6px; }
+        .page-sub { color: #999; font-size: 0.85rem; margin-bottom: 28px; }
 
-        /* STAT STRIP — ocean gems */
-        .stat-strip { display: flex; gap: 18px; flex-wrap: wrap; margin-bottom: 28px; }
+        /* ── STAT STRIP (color accents) ── */
+        .stat-strip { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 24px; }
         .stat-chip {
-            flex: 1; min-width: 150px; border-radius: 20px; padding: 18px 22px;
+            flex: 1; min-width: 150px; border-radius: 14px; padding: 16px 18px;
             color: white; box-shadow: var(--shadow);
-            backdrop-filter: blur(4px);
-            border: 1px solid rgba(255,255,255,0.2);
         }
-        .stat-chip.c1 { background: linear-gradient(135deg, #145c7a, #2f8aa8); }
-        .stat-chip.c2 { background: linear-gradient(135deg, #1b7a72, #44b8a3); }
-        .stat-chip.c3 { background: linear-gradient(135deg, #b8653a, #e8966a); }
-        .stat-chip.c4 { background: linear-gradient(135deg, #5f6c8a, #9ba3c7); }
-        .stat-chip .stat-num { font-size: 1.8rem; font-weight: 700; font-family: 'Playfair Display', serif; letter-spacing: 0.02em; }
-        .stat-chip .stat-label { font-size: 0.72rem; opacity: 0.8; margin-top: 4px; letter-spacing: 0.04em; }
+        .stat-chip.c1 { background: linear-gradient(135deg, var(--ocean), var(--accent)); }
+        .stat-chip.c2 { background: linear-gradient(135deg, var(--teal), #5fd8c2); }
+        .stat-chip.c3 { background: linear-gradient(135deg, var(--coral), #ffab8a); }
+        .stat-chip.c4 { background: linear-gradient(135deg, var(--violet), #b794fa); }
+        .stat-chip .stat-num { font-size: 1.5rem; font-weight: 700; font-family: 'Playfair Display', serif; }
+        .stat-chip .stat-label { font-size: 0.75rem; opacity: 0.9; margin-top: 2px; }
 
-        /* CARDS — pearl white */
+        /* ── CARDS ── */
         .card {
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(8px);
-            border-radius: var(--radius);
-            padding: 28px 30px; box-shadow: var(--shadow);
-            border: 1px solid rgba(255,255,255,0.6);
-            margin-bottom: 28px;
-            transition: var(--trans);
+            background: var(--white); border-radius: var(--radius);
+            padding: 28px; box-shadow: var(--shadow);
+            border: 1px solid var(--border); margin-bottom: 24px;
         }
-        .card:hover { background: rgba(255, 255, 255, 0.8); }
         .card-title {
-            font-family: 'Playfair Display', serif; font-size: 1.2rem;
-            color: var(--deep); margin-bottom: 22px; padding-bottom: 14px;
-            border-bottom: 2px solid rgba(43, 108, 130, 0.15);
+            font-family: 'Playfair Display', serif; font-size: 1.1rem;
+            color: var(--ink); margin-bottom: 20px; padding-bottom: 14px;
+            border-bottom: 1px solid var(--border);
             display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
         }
 
-        /* FORM ELEMENTS */
-        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 20px; align-items: end; }
-        .form-group { display: flex; flex-direction: column; gap: 6px; }
-        .form-label { font-size: 0.7rem; font-weight: 700; color: #1f5a70; text-transform: uppercase; letter-spacing: 0.08em; }
+        /* ── FORM ELEMENTS ── */
+        .form-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-bottom: 20px; align-items: end; }
+        .form-group { display: flex; flex-direction: column; gap: 5px; }
+        .form-label { font-size: 0.75rem; font-weight: 600; color: #888; text-transform: uppercase; letter-spacing: 0.06em; }
         .form-input {
-            padding: 11px 16px; border: 1.5px solid rgba(43, 108, 130, 0.2); border-radius: 14px;
+            padding: 10px 14px; border: 1.5px solid var(--border); border-radius: 10px;
             font-size: 0.9rem; font-family: 'DM Sans', sans-serif; outline: none;
-            transition: var(--trans); background: rgba(255,255,255,0.6); color: var(--ink);
+            transition: border-color 0.2s; background: var(--white); color: var(--ink);
         }
-        .form-input:focus { border-color: var(--wave); box-shadow: 0 0 0 4px rgba(47, 122, 146, 0.15); background: white; }
-        .form-input:disabled { background: #eef4f8; color: #5b6f7a; }
+        .form-input:focus { border-color: var(--accent); }
+        .form-input:disabled { background: #f9f9f9; color: #aaa; }
 
-        /* BUTTONS — ocean inspired */
+        /* ── BUTTONS ── */
         .btn {
-            display: inline-flex; align-items: center; gap: 8px;
-            padding: 10px 22px; border-radius: var(--pill); border: none;
+            display: inline-flex; align-items: center; gap: 7px;
+            padding: 10px 18px; border-radius: var(--pill); border: none;
             font-size: 0.85rem; font-weight: 600; cursor: pointer;
             font-family: 'DM Sans', sans-serif; transition: var(--trans);
             white-space: nowrap;
         }
-        .btn-primary { background: linear-gradient(120deg, var(--deep), var(--wave)); color: white; box-shadow: 0 4px 10px rgba(11, 43, 63, 0.2); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(11, 43, 63, 0.3); filter: brightness(1.05); }
-        .btn-danger { background: rgba(200, 70, 60, 0.12); color: var(--danger); border: 1px solid rgba(220, 107, 90, 0.3); }
-        .btn-danger:hover { background: var(--danger); color: white; border-color: var(--danger); }
+        .btn-primary { background: linear-gradient(120deg, var(--ocean), var(--accent)); color: var(--white); }
+        .btn-primary:hover { filter: brightness(1.08); transform: translateY(-1px); }
+        .btn-danger { background: #fff0ec; color: var(--danger); border: 1px solid #ffd3c6; }
+        .btn-danger:hover { background: var(--danger); color: var(--white); }
         .btn-danger:disabled { opacity: 0.4; cursor: not-allowed; }
-        .btn-sm { padding: 6px 14px; font-size: 0.75rem; }
+        .btn-sm { padding: 6px 12px; font-size: 0.78rem; }
         .btn-upload {
-            background: rgba(47, 122, 146, 0.08); color: var(--wave); border: 1.5px dashed var(--wave);
-            padding: 8px 16px; border-radius: 14px; cursor: pointer; font-size: 0.8rem;
+            background: var(--gold-lt); color: var(--ocean); border: 1px dashed var(--gold);
+            padding: 8px 14px; border-radius: 10px; cursor: pointer; font-size: 0.8rem;
             font-family: 'DM Sans', sans-serif; font-weight: 600; transition: var(--trans);
         }
-        .btn-upload:hover { background: var(--wave); color: white; border-color: var(--wave); }
+        .btn-upload:hover { background: var(--gold); color: var(--white); }
 
-        /* TABLE — clean ocean */
-        .table-wrap { overflow-x: auto; border-radius: 16px; border: 1px solid rgba(43, 108, 130, 0.12); background: rgba(255,255,255,0.4); }
+        /* ── TABLE ── */
+        .table-wrap { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); }
         table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-        thead { background: rgba(11, 43, 63, 0.04); backdrop-filter: blur(4px); }
-        th { padding: 14px 18px; text-align: left; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--abyss); border-bottom: 1px solid rgba(43, 108, 130, 0.1); }
-        td { padding: 14px 18px; border-bottom: 1px solid rgba(43, 108, 130, 0.05); vertical-align: middle; color: var(--ink); }
+        thead { background: var(--foam); }
+        th { padding: 12px 16px; text-align: left; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--ocean); border-bottom: 1px solid var(--border); }
+        td { padding: 13px 16px; border-bottom: 1px solid #f8f8f8; vertical-align: middle; color: var(--ink); }
         tbody tr:last-child td { border-bottom: none; }
-        tbody tr:hover td { background: rgba(47, 122, 146, 0.04); }
-        tbody tr.row-selected td { background: rgba(47, 122, 146, 0.08); }
+        tbody tr:hover td { background: #fafdff; }
+        tbody tr.row-selected td { background: #eaf6ff; }
 
-        .row-check { width: 18px; height: 18px; cursor: pointer; accent-color: var(--wave); }
+        .row-check { width: 18px; height: 18px; cursor: pointer; accent-color: var(--accent); }
 
-        .img-preview { width: 54px; height: 54px; object-fit: cover; border-radius: 14px; border: 2px solid rgba(255,255,255,0.6); box-shadow: 0 4px 8px rgba(0,0,0,0.04); }
-        .table-input { padding: 8px 12px; border: 1.5px solid rgba(43, 108, 130, 0.15); border-radius: 12px; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none; transition: var(--trans); background: rgba(255,255,255,0.5); }
-        .table-input:focus { border-color: var(--wave); background: white; box-shadow: 0 0 0 3px rgba(47, 122, 146, 0.1); }
+        .img-preview { width: 48px; height: 48px; object-fit: cover; border-radius: 8px; border: 1px solid var(--border); }
+        .table-input { padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 8px; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; }
+        .table-input:focus { border-color: var(--accent); }
 
-        /* BADGES */
-        .badge { display: inline-block; padding: 4px 12px; border-radius: var(--pill); font-size: 0.7rem; font-weight: 600; }
-        .badge-green { background: #c5e8e0; color: #0e6d5e; }
-        .badge-gold { background: #f7e3b4; color: #a1772a; }
-        .badge-violet { background: #d9d4f0; color: #4f3f8a; }
+        /* ── STATUS BADGE ── */
+        .badge { display: inline-block; padding: 3px 10px; border-radius: var(--pill); font-size: 0.72rem; font-weight: 600; }
+        .badge-green { background: #e3f9f3; color: #0f9d7c; }
+        .badge-gold { background: var(--gold-lt); color: #a07010; }
+        .badge-violet { background: #f1eafe; color: #7c4fe0; }
 
-        /* MESSAGE */
-        .msg { margin-top: 14px; font-size: 0.85rem; padding: 12px 18px; border-radius: 16px; }
-        .msg.ok { background: #c5e8e0; color: #0e6d5e; }
-        .msg.err { background: #fae2dd; color: var(--danger); }
+        /* ── MESSAGE ── */
+        .msg { margin-top: 12px; font-size: 0.85rem; padding: 10px 14px; border-radius: 10px; }
+        .msg.ok { background: #e3f9f3; color: #0f9d7c; }
+        .msg.err { background: #fff0ec; color: var(--danger); }
 
-        /* BULK BAR */
+        /* ── BULK ACTION BAR ── */
         .bulk-bar {
-            display: none; align-items: center; gap: 14px;
-            background: var(--deep); color: white; padding: 10px 24px;
-            border-radius: var(--pill); margin-bottom: 18px;
+            display: none; align-items: center; gap: 12px;
+            background: var(--ink); color: white; padding: 10px 18px;
+            border-radius: var(--pill); margin-bottom: 16px;
             animation: slideDown 0.25s ease;
             width: fit-content;
-            box-shadow: 0 4px 14px rgba(11, 43, 63, 0.25);
         }
         .bulk-bar.show { display: flex; }
-        .bulk-bar span { font-size: 0.85rem; font-weight: 500; }
+        .bulk-bar span { font-size: 0.85rem; font-weight: 600; }
         @keyframes slideDown { from { opacity:0; transform:translateY(-8px);} to {opacity:1; transform:translateY(0);} }
 
-        /* LOGIN OVERLAY — underwater dream */
+        /* ── ANIMATED LOGIN OVERLAY ── */
         .login-overlay {
             position: fixed; inset: 0; z-index: 9999;
-            background: radial-gradient(circle at 20% 30%, #144c66, #082f40 70%, #021e2b);
+            background: linear-gradient(125deg, #08395f, var(--ocean) 35%, var(--ocean-mid) 65%, var(--accent));
+            background-size: 300% 300%;
+            animation: gradientShift 10s ease infinite;
             display: none; align-items: center; justify-content: center; padding: 20px;
             overflow: hidden;
         }
         .login-overlay.show { display: flex; }
+        @keyframes gradientShift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* Floating bubble decorations */
         .bubble {
             position: absolute; border-radius: 50%;
-            background: rgba(255,255,255,0.07);
+            background: rgba(255,255,255,0.08);
             animation: floatUp linear infinite;
-            border: 1px solid rgba(255,255,255,0.03);
         }
         @keyframes floatUp {
             0% { transform: translateY(0) translateX(0); opacity: 0; }
-            15% { opacity: 0.8; }
-            85% { opacity: 0.8; }
-            100% { transform: translateY(-120vh) translateX(30px); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(-110vh) translateX(20px); opacity: 0; }
+        }
+
+        /* ── FISH-PULL STAGE ── */
+        .login-stage {
+            position: relative; z-index: 2;
+            width: 100%; max-width: 460px;
+            display: flex; align-items: center; justify-content: center;
+            min-height: 460px;
         }
 
         .login-card {
             position: relative; z-index: 2;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-            border-radius: 32px;
-            padding: 48px 40px; width: 100%; max-width: 400px; text-align: center;
-            box-shadow: 0 40px 80px rgba(0,0,0,0.5);
-            animation: cardEnter 0.7s cubic-bezier(0.34,1.56,0.64,1);
-            border: 1px solid rgba(255,255,255,0.3);
+            background: var(--white); border-radius: 24px;
+            padding: 44px 36px; width: 100%; max-width: 400px; text-align: center;
+            box-shadow: 0 30px 70px rgba(0,0,0,0.35);
+            opacity: 0;
         }
-        @keyframes cardEnter {
-            from { opacity: 0; transform: translateY(40px) scale(0.94); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        .login-card.pull-in {
+            animation: cardPullIn 1.3s cubic-bezier(0.22,1,0.36,1) forwards;
+            animation-delay: 0.55s;
         }
-        .login-fish { font-size: 3rem; margin-bottom: 8px; display: block; animation: bob 4s ease-in-out infinite; }
-        @keyframes bob {
-            0%, 100% { transform: translateY(0) rotate(0deg); }
-            50% { transform: translateY(-10px) rotate(-3deg); }
+        @keyframes cardPullIn {
+            0%   { opacity: 0; transform: translateX(150%) rotate(3deg); }
+            70%  { opacity: 1; transform: translateX(-3%) rotate(-0.5deg); }
+            100% { opacity: 1; transform: translateX(0) rotate(0deg); }
         }
-        .login-card h2 { font-family: 'Playfair Display', serif; color: var(--deep); font-size: 1.8rem; margin-bottom: 6px; }
-        .login-card p { color: #3d6b7c; font-size: 0.85rem; margin-bottom: 30px; }
-        .login-input {
-            width: 100%; padding: 14px 18px; margin-bottom: 14px;
-            border: 1.5px solid rgba(43, 108, 130, 0.2); border-radius: 16px;
-            font-size: 0.95rem; font-family: 'DM Sans', sans-serif; outline: none;
-            transition: var(--trans); background: rgba(255,255,255,0.5);
+        .login-card.push-out {
+            animation: cardPushOut 0.85s cubic-bezier(0.55,0,0.85,0.35) forwards;
         }
-        .login-input:focus { border-color: var(--wave); box-shadow: 0 0 0 4px rgba(47, 122, 146, 0.12); background: white; }
-        .btn-login {
-            width: 100%; padding: 16px; background: linear-gradient(120deg, var(--deep), var(--wave));
-            color: white; border: none; border-radius: 16px; font-size: 1rem;
-            font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif;
-            transition: var(--trans); margin-top: 4px; box-shadow: 0 6px 20px rgba(11, 43, 63, 0.25);
+        @keyframes cardPushOut {
+            0%   { opacity: 1; transform: translateX(0) rotate(0deg); }
+            100% { opacity: 0; transform: translateX(-150%) rotate(-6deg); }
         }
-        .btn-login:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(11, 43, 63, 0.35); filter: brightness(1.04); }
-        .btn-login:disabled { background: #a0b8c4; cursor: not-allowed; }
-        .btn-back-store { background: none; border: none; color: #3d6b7c; margin-top: 16px; cursor: pointer; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; transition: color 0.2s; }
-        .btn-back-store:hover { color: var(--deep); }
 
+        /* The fish actor */
+        .swim-fish {
+            position: absolute; z-index: 3;
+            width: 70px; height: 70px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%) translateX(280%) scaleX(-1);
+            opacity: 0;
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.3));
+            pointer-events: none;
+        }
+        .swim-fish.swim-in {
+            animation: fishSwimIn 1.3s cubic-bezier(0.22,1,0.36,1) forwards;
+            animation-delay: 0.5s;
+        }
+        @keyframes fishSwimIn {
+            0%   { opacity: 0; transform: translate(-50%, -50%) translateX(280%) scaleX(-1) rotate(0deg); }
+            8%   { opacity: 1; }
+            70%  { transform: translate(-50%, -50%) translateX(46%) translateY(-4%) scaleX(-1) rotate(-5deg); }
+            100% { transform: translate(-50%, -50%) translateX(52%) translateY(0%) scaleX(-1) rotate(0deg); }
+        }
+        .swim-fish.idle-wag {
+            animation: fishWag 1.8s ease-in-out infinite;
+        }
+        @keyframes fishWag {
+            0%, 100% { transform: translate(-50%, -50%) translateX(52%) translateY(0) scaleX(-1) rotate(0deg); }
+            50%      { transform: translate(-50%, -50%) translateX(52%) translateY(-5px) scaleX(-1) rotate(3deg); }
+        }
+        .swim-fish.swim-out {
+            animation: fishSwimOut 0.85s cubic-bezier(0.55,0,0.85,0.35) forwards;
+        }
+        @keyframes fishSwimOut {
+            0%   { transform: translate(-50%, -50%) translateX(52%) scaleX(-1) rotate(0deg); opacity: 1; }
+            100% { transform: translate(-50%, -50%) translateX(-230%) scaleX(-1) rotate(10deg); opacity: 0; }
+        }
+
+        /* Tow rope between fish and card */
+        .tow-rope {
+            position: absolute; z-index: 1;
+            top: 50%; left: 50%;
+            height: 2px; width: 56px;
+            background: repeating-linear-gradient(90deg, rgba(255,255,255,0.55) 0 6px, transparent 6px 11px);
+            transform: translate(-50%, -50%) translateX(82%);
+            opacity: 0;
+        }
+        .tow-rope.show { opacity: 1; transition: opacity 0.3s ease 1.5s; }
+
+        .login-fish {
+            font-size: 2.8rem; margin-bottom: 6px; display: block;
+        }
+        .login-card h2 { font-family: 'Playfair Display', serif; color: var(--ocean); font-size: 1.7rem; margin-bottom: 6px; }
+        .login-card p { color: #aaa; font-size: 0.85rem; margin-bottom: 28px; }
+        .login-input {
+            width: 100%; padding: 13px 16px; margin-bottom: 12px;
+            border: 1.5px solid var(--border); border-radius: 12px;
+            font-size: 0.95rem; font-family: 'DM Sans', sans-serif; outline: none;
+            transition: var(--trans);
+        }
+        .login-input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px rgba(47,159,214,0.12); }
+        .btn-login {
+            width: 100%; padding: 15px; background: linear-gradient(120deg, var(--ocean), var(--ocean-mid), var(--accent));
+            background-size: 200% auto;
+            color: var(--white); border: none; border-radius: 12px; font-size: 1rem;
+            font-weight: 700; cursor: pointer; font-family: 'DM Sans', sans-serif;
+            transition: var(--trans); margin-top: 4px;
+        }
+        .btn-login:hover:not(:disabled) { background-position: right center; transform: translateY(-1px); box-shadow: 0 8px 20px rgba(12,74,122,0.3); }
+        .btn-login:disabled { background: #ccc; cursor: not-allowed; }
+        .btn-back-store { background: none; border: none; color: #bbb; margin-top: 16px; cursor: pointer; font-size: 0.85rem; font-family: 'DM Sans', sans-serif; transition: color 0.2s; }
+        .btn-back-store:hover { color: var(--ocean); }
+
+        /* ── IMAGE UPLOAD CELL ── */
         .upload-cell { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
         .upload-cell input[type="file"] { display: none; }
 
@@ -267,22 +328,35 @@
 <!-- LOGIN OVERLAY -->
 <div id="adminLoginOverlay" class="login-overlay">
     <div id="bubbleField"></div>
-    <div class="login-card">
-        <span class="login-fish">🐠</span>
-        <h2>Ocean Gateway</h2>
-        <p>Sign in to manage the catch</p>
-        <form id="adminLoginForm" onsubmit="submitAdminLogin(event)">
-            <input type="email" id="loginEmail" class="login-input" placeholder="Admin email" required>
-            <input type="password" id="loginPassword" class="login-input" placeholder="Password" required>
-            <button type="submit" id="loginSubmitBtn" class="btn-login">Dive In</button>
-        </form>
-        <button onclick="window.location.href='index.html'" class="btn-back-store">← Back to Store</button>
+    <div class="login-stage">
+        <div id="towRope" class="tow-rope"></div>
+
+        <div id="loginCard" class="login-card">
+            <h2>Admin Gateway</h2>
+            <p>Sign in with your administrator credentials</p>
+            <form id="adminLoginForm" onsubmit="submitAdminLogin(event)">
+                <input type="email" id="loginEmail" class="login-input" placeholder="Admin email" required>
+                <input type="password" id="loginPassword" class="login-input" placeholder="Password" required>
+                <button type="submit" id="loginSubmitBtn" class="btn-login">Sign In to Dashboard</button>
+            </form>
+            <button onclick="window.location.href='index.html'" class="btn-back-store">← Back to Store</button>
+        </div>
+
+        <svg id="swimFish" class="swim-fish" viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">
+            <ellipse cx="42" cy="35" rx="32" ry="20" fill="#2f9fd6"/>
+            <ellipse cx="48" cy="38" rx="24" ry="14" fill="#5fc1e8"/>
+            <path d="M10 35 L-8 18 L-8 52 Z" fill="#1668a8"/>
+            <path d="M40 16 L52 -4 L60 14 Z" fill="#1668a8"/>
+            <circle cx="62" cy="28" r="4" fill="#0c2d3f"/>
+            <circle cx="63.3" cy="26.7" r="1.3" fill="white"/>
+            <path d="M55 45 Q62 50 70 46" stroke="#0c2d3f" stroke-width="2" fill="none" stroke-linecap="round"/>
+        </svg>
     </div>
 </div>
 
 <!-- TOP BAR -->
 <div class="topbar">
-    <div class="topbar-logo">🌊 BAHARI <span>FRESH</span> <small>admin · reef</small></div>
+    <div class="topbar-logo">🌊 BAHARI <span>FRESH</span> <span style="color:rgba(255,255,255,0.4);font-size:0.9rem;font-family:'DM Sans',sans-serif;font-weight:400;margin-left:6px;">Admin</span></div>
     <div class="topbar-right">
         <span class="topbar-email" id="topbarEmail"></span>
         <button class="btn-logout" onclick="logout()">Sign Out</button>
@@ -293,10 +367,10 @@
     <!-- SIDE NAV -->
     <nav class="sidenav">
         <span class="sidenav-label">Dashboard</span>
-        <button id="btnProfile" class="nav-btn active" onclick="showSection('profile')"><span class="nav-icon">🐚</span> My Profile</button>
+        <button id="btnProfile" class="nav-btn active" onclick="showSection('profile')"><span class="nav-icon">👤</span> My Profile</button>
         <button id="btnProducts" class="nav-btn" onclick="showSection('products')"><span class="nav-icon">🐟</span> Products</button>
         <button id="btnOrders" class="nav-btn" onclick="showSection('orders')"><span class="nav-icon">📦</span> Orders</button>
-        <button id="btnUsers" class="nav-btn" onclick="showSection('users')"><span class="nav-icon">🦈</span> Admin Users</button>
+        <button id="btnUsers" class="nav-btn" onclick="showSection('users')"><span class="nav-icon">🛡️</span> Admin Users</button>
     </nav>
 
     <!-- MAIN CONTENT -->
@@ -347,7 +421,7 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Category</label>
-                        <input type="text" id="prodCategory" class="form-input" placeholder="Fish / Shellfish">
+                        <input type="text" id="prodCategory" class="form-input" placeholder="Fish / Shellfish / Other">
                     </div>
                     <div class="form-group">
                         <label class="form-label">Stock (kg)</label>
@@ -355,9 +429,13 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Product Image</label>
-                        <label class="btn-upload">📁 Choose Image
-                            <input type="file" id="prodImageFile" accept="image/*" onchange="previewAndUpload(this)">
-                        </label>
+                        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+                            <label class="btn-upload">📁 Choose Image
+                                <input type="file" id="prodImageFile" accept="image/*" onchange="previewAndUpload(this)">
+                            </label>
+                            <img id="prodImagePreview" src="" alt="preview" style="display:none;width:52px;height:52px;object-fit:cover;border-radius:10px;border:1.5px solid var(--border);">
+                        </div>
+                        <small style="color:#aaa;font-size:0.72rem;margin-top:4px;display:block;">Works even without a Storage bucket — image saves directly.</small>
                     </div>
                     <div class="form-group" style="justify-content:flex-end;">
                         <button class="btn btn-primary" onclick="addProduct()">＋ Add Product</button>
@@ -367,13 +445,13 @@
             <div class="card">
                 <div class="card-title">
                     <span>All Products</span>
-                    <span id="selectionCount" style="font-size:0.75rem;color:#2f7a92;font-weight:500;"></span>
+                    <span id="selectionCount" style="font-size:0.75rem;color:#aaa;font-weight:500;"></span>
                 </div>
 
                 <div id="bulkBar" class="bulk-bar">
                     <span id="bulkCountText">0 selected</span>
                     <button class="btn btn-danger btn-sm" onclick="deleteSelectedProducts()">🗑 Delete Selected</button>
-                    <button class="btn btn-sm" style="background:rgba(255,255,255,0.1);color:white;" onclick="clearSelection()">Cancel</button>
+                    <button class="btn btn-sm" style="background:rgba(255,255,255,0.15);color:white;" onclick="clearSelection()">Cancel</button>
                 </div>
 
                 <div class="table-wrap">
@@ -446,17 +524,17 @@
         const field = document.getElementById('bubbleField');
         if (!field) return;
         field.innerHTML = '';
-        const count = 22;
+        const count = 18;
         for (let i = 0; i < count; i++) {
             const b = document.createElement('div');
-            const size = 8 + Math.random() * 28;
+            const size = 6 + Math.random() * 22;
             b.className = 'bubble';
             b.style.width = size + 'px';
             b.style.height = size + 'px';
             b.style.left = Math.random() * 100 + '%';
-            b.style.bottom = '-50px';
-            b.style.animationDuration = (10 + Math.random() * 14) + 's';
-            b.style.animationDelay = (Math.random() * 12) + 's';
+            b.style.bottom = '-40px';
+            b.style.animationDuration = (8 + Math.random() * 10) + 's';
+            b.style.animationDelay = (Math.random() * 10) + 's';
             field.appendChild(b);
         }
     }
@@ -466,6 +544,7 @@
         if (!user) {
             document.getElementById('adminLoginOverlay').classList.add('show');
             spawnBubbles();
+            playFishEntrance();
             return;
         }
         const { data: admin } = await _supabase.from('admin_users').select('email').eq('email', user.email).maybeSingle();
@@ -482,15 +561,53 @@
         showSection('profile');
     }
 
+    function playFishEntrance() {
+        const fish = document.getElementById('swimFish');
+        const card = document.getElementById('loginCard');
+        const rope = document.getElementById('towRope');
+        fish.classList.remove('idle-wag', 'swim-out');
+        card.classList.remove('push-out');
+        fish.classList.add('swim-in');
+        card.classList.add('pull-in');
+        rope.classList.add('show');
+        setTimeout(() => fish.classList.add('idle-wag'), 1850);
+    }
+
+    function playFishExit(onDone) {
+        const fish = document.getElementById('swimFish');
+        const card = document.getElementById('loginCard');
+        const rope = document.getElementById('towRope');
+        fish.classList.remove('idle-wag', 'swim-in');
+        card.classList.remove('pull-in');
+        rope.classList.remove('show');
+        fish.classList.add('swim-out');
+        card.classList.add('push-out');
+        setTimeout(onDone, 900);
+    }
+
     async function submitAdminLogin(e) {
         e.preventDefault();
         const email = document.getElementById('loginEmail').value.trim();
         const password = document.getElementById('loginPassword').value;
         const btn = document.getElementById('loginSubmitBtn');
-        btn.disabled = true; btn.innerText = 'Diving…';
+        btn.disabled = true; btn.innerText = 'Verifying…';
         const { error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) { alert('Login failed: ' + error.message); btn.disabled = false; btn.innerText = 'Dive In'; }
-        else await checkAdmin();
+        if (error) {
+            alert('Login failed: ' + error.message);
+            btn.disabled = false; btn.innerText = 'Sign In to Dashboard';
+            return;
+        }
+        // Verify admin status before celebrating
+        const { data: { user } } = await _supabase.auth.getUser();
+        const { data: admin } = await _supabase.from('admin_users').select('email').eq('email', user.email).maybeSingle();
+        if (!admin) {
+            alert("🔒 Access Denied: Not an admin account");
+            await _supabase.auth.signOut();
+            window.location.href = 'index.html';
+            return;
+        }
+        btn.innerText = 'Welcome! ✓';
+        playFishExit(() => checkAdmin());
     }
 
     async function updateAdminProfile() {
@@ -507,39 +624,80 @@
         el.innerText = text;
     }
 
-    async function uploadImageToStorage(file, productId) {
-        const ext = file.name.split('.').pop();
-        const fileName = `product-${productId}-${Date.now()}.${ext}`;
-        const { error } = await _supabase.storage.from('product-images').upload(fileName, file);
-        if (error) throw error;
-        const { data } = _supabase.storage.from('product-images').getPublicUrl(fileName);
-        return data.publicUrl;
+    // Convert file to base64 string (works without Storage bucket)
+    function fileToBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = () => reject(new Error('Failed to read file'));
+            reader.readAsDataURL(file);
+        });
     }
 
+    // Try Supabase Storage first; fall back to base64 stored in DB
+    async function uploadImageToStorage(file, productId) {
+        // Attempt Storage bucket upload
+        try {
+            const ext = file.name.split('.').pop().toLowerCase();
+            const fileName = `product-${productId}-${Date.now()}.${ext}`;
+            const { error: upErr } = await _supabase.storage
+                .from('product-images').upload(fileName, file, { upsert: true });
+            if (!upErr) {
+                const { data } = _supabase.storage.from('product-images').getPublicUrl(fileName);
+                return data.publicUrl;
+            }
+            console.warn('Storage upload failed, falling back to base64:', upErr.message);
+        } catch(e) {
+            console.warn('Storage not available:', e.message);
+        }
+        // Fallback: convert to base64 and store in DB directly
+        const b64 = await fileToBase64(file);
+        return b64;
+    }
+
+    // Show live preview when file is picked
     window.previewAndUpload = async (input) => {
         const file = input.files[0];
         if (!file) return;
         tempProductFile = file;
-        alert('Image selected. Click "Add Product" to save.');
+        // Show preview thumbnail
+        const preview = document.getElementById('prodImagePreview');
+        if (preview) {
+            const b64 = await fileToBase64(file);
+            preview.src = b64;
+            preview.style.display = 'block';
+        }
     };
 
     async function addProduct() {
-        const name = document.getElementById('prodName').value.trim();
-        const price = parseFloat(document.getElementById('prodPrice').value);
+        const name     = document.getElementById('prodName').value.trim();
+        const price    = parseFloat(document.getElementById('prodPrice').value);
         const category = document.getElementById('prodCategory').value.trim();
-        const stock = parseInt(document.getElementById('prodStock').value);
+        const stock    = parseInt(document.getElementById('prodStock').value);
         if (!name || isNaN(price) || isNaN(stock)) { alert('Name, price, and stock are required'); return; }
-        const { data: newProduct, error } = await _supabase.from('products').insert([{ name, price, category, stock_quantity: stock, image_url: '' }]).select().single();
+
+        // Insert product first (image_url empty for now)
+        const { data: newProduct, error } = await _supabase
+            .from('products').insert([{ name, price, category, stock_quantity: stock, image_url: '' }])
+            .select().single();
         if (error) { alert(error.message); return; }
+
+        // Upload image if selected
         if (tempProductFile) {
             try {
                 const url = await uploadImageToStorage(tempProductFile, newProduct.id);
                 await _supabase.from('products').update({ image_url: url }).eq('id', newProduct.id);
                 tempProductFile = null;
-            } catch (err) { alert('Product added but image upload failed.'); }
+            } catch (err) {
+                console.error('Image error:', err);
+                alert('Product saved but image could not be attached: ' + err.message);
+            }
         }
+
         ['prodName','prodPrice','prodCategory','prodStock'].forEach(id => document.getElementById(id).value = '');
         document.getElementById('prodImageFile').value = '';
+        const prev = document.getElementById('prodImagePreview');
+        if (prev) { prev.src=''; prev.style.display='none'; }
         loadProducts();
     }
 
@@ -548,8 +706,14 @@
 
     async function updateProductImageFromFile(id, input) {
         const file = input.files[0]; if (!file) return;
-        try { const url = await uploadImageToStorage(file, id); await _supabase.from('products').update({ image_url: url }).eq('id', id); loadProducts(); }
-        catch (err) { alert('Image upload failed'); }
+        // Show loading state on the row image
+        try {
+            const url = await uploadImageToStorage(file, id);
+            await _supabase.from('products').update({ image_url: url }).eq('id', id);
+            loadProducts();
+        } catch (err) {
+            alert('Image upload failed: ' + err.message);
+        }
         input.value = '';
     }
 
@@ -634,14 +798,14 @@
         document.querySelector('#productsTable tbody').innerHTML = data.map(p => `
             <tr data-id="${p.id}">
                 <td><input type="checkbox" class="row-check" data-row="${p.id}" onchange="toggleRowSelect('${p.id}', this.checked)"></td>
-                <td><img src="${p.image_url || ''}" class="img-preview" onerror="this.src='https://placehold.co/54x54/1a5b78/fff?text=🐟'"></td>
+                <td><img src="${p.image_url || ''}" class="img-preview" onerror="this.src='https://placehold.co/48x48/0c4a7a/fff?text=🐟'"></td>
                 <td><strong>${p.name}</strong></td>
                 <td><input class="table-input" type="number" value="${p.price}" style="width:90px;" onchange="updateProductPrice('${p.id}', this.value)"></td>
                 <td>${p.category ? `<span class="badge badge-violet">${p.category}</span>` : '—'}</td>
                 <td><input class="table-input" type="number" value="${p.stock_quantity}" style="width:75px;" onchange="updateProductStock('${p.id}', this.value)"></td>
                 <td>
                     <div class="upload-cell">
-                        <label class="btn btn-sm" style="background:rgba(47,122,146,0.08);color:var(--wave);border:1px solid var(--wave);cursor:pointer;">📷 Image
+                        <label class="btn btn-sm" style="background:var(--gold-lt);color:var(--ocean);border:1px solid var(--gold);cursor:pointer;">📷 Image
                             <input type="file" accept="image/*" onchange="updateProductImageFromFile('${p.id}', this)">
                         </label>
                         <button class="btn btn-danger btn-sm" onclick="deleteProduct('${p.id}', '${p.image_url || ''}')">Delete</button>
@@ -660,7 +824,7 @@
                 <td style="max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${o.items}</td>
                 <td><strong>KSh ${Number(o.total_price).toLocaleString()}</strong></td>
                 <td><span class="badge ${o.status === 'paid' ? 'badge-green' : 'badge-gold'}">${o.status}</span></td>
-                <td style="color:#1f5a70;font-size:0.8rem;">${new Date(o.created_at).toLocaleString()}</td>
+                <td style="color:#aaa;font-size:0.8rem;">${new Date(o.created_at).toLocaleString()}</td>
             </tr>
         `).join('');
     }
